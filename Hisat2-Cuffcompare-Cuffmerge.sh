@@ -1,8 +1,5 @@
 #!/bin/bash
 
-set -x
-set -e
-
 usage() {
       echo ""
       echo "Usage : sh $0 -g <reference_genome>  -i <Index_folder> -A <reference_annotation> -l lib_type {-1 <left_reads> -2 <right_reads> | -U <single_reads> | -s <sra_id>} -O <output_folder for Bam files> -p num_threads -5 <integer> -3 <integer> {-q phred_33 -Q phred_64} -m min_intron -M max_intron {-t stringtie -c cufflinks} -f <integer> -e <cuff_m>"
