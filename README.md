@@ -1,17 +1,17 @@
 # RMTA-1.0
 
-RMTA (Read Mapping and Transcript Assembly) is a workflow that can process raw RNA-seq data either paired-end or single-end or from NCBI’s sequence read archive (SRA) directly and generate transcript assembly
+RMTA (Read Mapping and Transcript Assembly) is a workflow that can rapidly process raw RNA-seq data by mapping reads using HiSat2 and then assemble transcripts using either Cufflinks or Stringtie. RMTA can process FASTq files containing paired-end or single-end reads. Alternatively, RMTA can directly process one or more sequence read archives (SRA) from NCBI using a SRA ID #.
 
-RMTA minimally requires the following input data
+RMTA minimally requires the following input data:
 
-1. Reference Genome (FASTA) or Hisat2 Indexed Reference Genome (in a folder)
-2. Reference Transcriptome (GFF3)
-3. RNA-Seq reads (FASTQ) - Single end or Paired end or NCBI SRA id or multiple NCBI SRA id's
+1. Reference Genome (FASTA) or Hisat2 Indexed Reference Genome (in a subdirectory)
+2. Reference Transcriptome (GFF3/GTF/GFF)
+3. RNA-Seq reads (FASTQ) - Single end or Paired end or NCBI SRA id or multiple NCBI SRA id's (list in a single column text file).
 
 # Availability 
 ### Using Docker image
 
-Since there are several dependencies (these can be seen in Dockerfile) for running Evolinc-I on your linux or MAC OS, we highly recommend using the available Docker image for RMTA or the [Dockerfile](https://hub.docker.com/r/evolinc/rmta/~/dockerfile/) to build an image and then use the built image.
+Since there are several dependencies (these can be seen in Dockerfile) for running RMTA on your linux or MAC OS, we highly recommend using the available Docker image for RMTA or the [Dockerfile](https://hub.docker.com/r/evolinc/rmta/~/dockerfile/) to build an image and then use the built image.
 
 ```
 # Pull the image from Dockerhub
