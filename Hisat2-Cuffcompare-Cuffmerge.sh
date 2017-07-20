@@ -360,8 +360,7 @@ if [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ] &
     mkdir "$bam_out"
     numb=$(ls "${left_reads[@]}" | wc -l)
     for f in "${left_reads[@]}"; do
-      extension=$(echo "$f" | awk -F '.' '{print $(NF-1) "." $(NF)}')
-      echo $extension
+      extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
        
       if [[ "$extension" =~ "fq.gz" ]]; then
         filename=$(basename "$f" ".fq.gz")
@@ -472,7 +471,7 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
     mkdir "$bam_out"
     numb=$(ls "${left_reads[@]}" | wc -l)
     for f in "${left_reads[@]}"; do
-      extension=$(echo "$f" | awk -F '.' '{print $(NF-1) "." $(NF)}')
+      extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
        
       if [[ "$extension" =~ "fq.gz" ]]; then
         filename=$(basename "$f" ".fq.gz")
@@ -586,7 +585,7 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ]
     mkdir "$bam_out"
     numb=$(ls "${left_reads[@]}" | wc -l)
     for f in "${left_reads[@]}"; do
-      extension=$(echo "$f" | awk -F '.' '{print $(NF-1) "." $(NF)}')
+      extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
        
       if [[ "$extension" =~ "fq.gz" ]]; then
         filename=$(basename "$f" ".fq.gz")
@@ -698,7 +697,7 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
     mkdir "$bam_out"
     numb=$(ls "${left_reads[@]}" | wc -l)
     for f in "${left_reads[@]}"; do
-      extension=$(echo "$f" | awk -F '.' '{print $(NF-1) "." $(NF)}')
+      extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
        
       if [[ "$extension" =~ "fq.gz" ]]; then
         filename=$(basename "$f" ".fq.gz")
