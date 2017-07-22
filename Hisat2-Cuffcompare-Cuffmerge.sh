@@ -212,11 +212,10 @@ stringtie_SRA_single()
     if [ "$var" -eq 0 ]; then
       rm listtoremove.txt "$bam_out"/$sra_id.gtf.filtered.gtf
     else
-      cuffcompare "$bam_out"/$sra_id.gtf.filtered.gtf -r $referenceannotation -o $f
+      cuffcompare "$bam_out"/$sra_id.gtf.filtered.gtf -r $referenceannotation -o $sra_id
       rm listtoremove.txt
       mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
    fi
-
 }
 
 cufflinks_SRA_single()
@@ -228,10 +227,15 @@ cufflinks_SRA_single()
     mv "$bam_out"/isoforms.fpkm_tracking "$bam_out"/$sra_id.isoforms.fpkm_tracking
     mv "$bam_out"/genes.fpkm_tracking "$bam_out"/$sra_id.genes.fpkm_tracking
     coverge_cuffoff_SRA_single           
-    cuffcompare "$bam_out"/$sra_id.gtf.filtered.gtf -r $referenceannotation -o $sra_id
-    mv *.tracking *.loci *.combined.gtf *.stats "$bam_out" 
-}
+    if [ "$var" -eq 0 ]; then
+      rm listtoremove.txt "$bam_out"/$sra_id.gtf.filtered.gtf
+    else
+      cuffcompare "$bam_out"/$sra_id.gtf.filtered.gtf -r $referenceannotation -o $sra_id
+      rm listtoremove.txt
+      mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+   fi
 
+}
 
 ##################
 ### Multi SRA ###
@@ -242,14 +246,12 @@ coverge_cuffoff_SRA_multi()
     if [ "$threshold" -eq "$param5" ]; then
        grep " transcript" "$bam_out"/$f.gtf | grep -e 'cov "4.' -e 'cov "3.' -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
-       grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
        var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
        if [ "$var" -eq 0 ]; then
           echo No transcripts have FPKM values exceeding your "$param5" cut-off have been found in $f.gtf.filtered.gtf. Try lowering your cut-off 1>&2
        fi      
     elif [ "$threshold" -eq "$param4" ]; then
        grep " transcript" "$bam_out"/$f.gtf | grep -e 'cov "3.' -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
-       grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
        grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
        var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
        if [ "$var" -eq 0 ]; then
@@ -258,7 +260,6 @@ coverge_cuffoff_SRA_multi()
     elif [ "$threshold" -eq "$param3" ]; then
        grep " transcript" "$bam_out"/$f.gtf | grep -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
-       grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
        var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
        if [ "$var" -eq 0 ]; then
           echo No transcripts have FPKM values exceeding your "$param3" cut-off have been found in $f.gtf.filtered.gtf. Try lowering your cut-off 1>&2
@@ -266,14 +267,12 @@ coverge_cuffoff_SRA_multi()
     elif [ "$threshold" -eq "$param2" ]; then
        grep " transcript" "$bam_out"/$f.gtf | grep -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
-       grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
        var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
        if [ "$var" -eq 0 ]; then
           echo No transcripts have FPKM values exceeding your "$param2" cut-off have been found in $f.gtf.filtered.gtf. Try lowering your cut-off 1>&2
        fi       
     elif [ "$threshold" -eq "$param1" ]; then
        grep " transcript" "$bam_out"/$f.gtf | grep -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
-       grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
        grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
        var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
        if [ "$var" -eq 0 ]; then
@@ -296,14 +295,13 @@ stringtie_SRA_multi()
     coverge_cuffoff_SRA_multi
     var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
     if [ "$var" -eq 0 ]; then
-      rm listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf
+      rm listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf
     else
       cuffcompare "$bam_out"/$f.gtf.filtered.gtf -r $referenceannotation -o $f
       rm listtoremove.txt
       mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
     fi
 }
-
 
 cufflinks_SRA_multi()
 {
@@ -316,7 +314,7 @@ cufflinks_SRA_multi()
     coverge_cuffoff_SRA_multi
     var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
     if [ "$var" -eq 0 ]; then
-      rm listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf
+      rm listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf
     else
       cuffcompare "$bam_out"/$f.gtf.filtered.gtf -r $referenceannotation -o $f
       rm listtoremove.txt
