@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# set -x
+# set -e
+
 usage() {
       echo ""
       echo "Usage : sh $0 -g <reference_genome>  -i <Index_folder> -A <reference_annotation> -l lib_type {-1 <left_reads> -2 <right_reads> | -U <single_reads> | -s <sra_id>} -O <output_folder for Bam files> -p num_threads -5 <integer> -3 <integer> {-q phred_33 -Q phred_64} -m min_intron -M max_intron {-t stringtie -c cufflinks} -f <integer> -e <cuff_m>"
@@ -158,25 +161,41 @@ coverge_cuffoff_SRA_single()
     if [ "$threshold" -eq "$param5" ]; then
        grep " transcript" "$bam_out"/$sra_id.gtf | grep -e 'cov "4.' -e 'cov "3.' -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$sra_id.gtf >"$bam_out"/$sra_id.gtf.filtered.gtf
-       rm listtoremove.txt
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$sra_id.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param5" cut-off have been found in $sra_id.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi             
     elif [ "$threshold" -eq "$param4" ]; then
        grep " transcript" "$bam_out"/$sra_id.gtf | grep -e 'cov "3.' -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$sra_id.gtf >"$bam_out"/$sra_id.gtf.filtered.gtf
-       rm listtoremove.txt
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$sra_id.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param4" cut-off have been found in $sra_id.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi             
     elif [ "$threshold" -eq "$param3" ]; then
        grep " transcript" "$bam_out"/$sra_id.gtf | grep -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$sra_id.gtf >"$bam_out"/$sra_id.gtf.filtered.gtf
-       rm listtoremove.txt
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$sra_id.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param3" cut-off have been found in $sra_id.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi             
     elif [ "$threshold" -eq "$param2" ]; then
        grep " transcript" "$bam_out"/$sra_id.gtf | grep -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$sra_id.gtf >"$bam_out"/$sra_id.gtf.filtered.gtf
-       rm listtoremove.txt
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$sra_id.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param2" cut-off have been found in $sra_id.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi             
     elif [ "$threshold" -eq "$param1" ]; then
        grep " transcript" "$bam_out"/$sra_id.gtf | grep -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$sra_id.gtf >"$bam_out"/$sra_id.gtf.filtered.gtf
-       rm listtoremove.txt
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$sra_id.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param1" cut-off have been found in $sra_id.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi             
     elif [ "$threshold" -eq "$param0" ]; then
-        mv "$bam_out"/$sra_id.gtf "$bam_out"/$sra_id.gtf.filtered.gtf
+       grep " transcript" "$bam_out"/$sra_id.gtf | grep -e 'cov "0.000' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$sra_id.gtf >"$bam_out"/$sra_id.gtf.filtered.gtf
     else
         echo "Invalid coverage parameter. Please select a whole number between 0-5"
         exit
@@ -189,8 +208,15 @@ stringtie_SRA_single()
     rm $sra_id.sam
     stringtie -G $referenceannotation "$bam_out"/$sra_id.sorted.bam -o "$bam_out"/$sra_id.gtf -p $num_threads
     coverge_cuffoff_SRA_single  
-    cuffcompare "$bam_out"/$sra_id.gtf.filtered.gtf -r $referenceannotation -o $sra_id
-    mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+    var=$(grep -vFf listtoremove.txt "$bam_out"/$sra_id.gtf.filtered.gtf | wc -l)
+    if [ "$var" -eq 0 ]; then
+      rm listtoremove.txt "$bam_out"/$sra_id.gtf.filtered.gtf
+    else
+      cuffcompare "$bam_out"/$sra_id.gtf.filtered.gtf -r $referenceannotation -o $f
+      rm listtoremove.txt
+      mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+   fi
+
 }
 
 cufflinks_SRA_single()
@@ -216,25 +242,46 @@ coverge_cuffoff_SRA_multi()
     if [ "$threshold" -eq "$param5" ]; then
        grep " transcript" "$bam_out"/$f.gtf | grep -e 'cov "4.' -e 'cov "3.' -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
-       rm listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param5" cut-off have been found in $f.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi      
     elif [ "$threshold" -eq "$param4" ]; then
        grep " transcript" "$bam_out"/$f.gtf | grep -e 'cov "3.' -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
-       rm listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param4" cut-off have been found in $f.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi       
     elif [ "$threshold" -eq "$param3" ]; then
        grep " transcript" "$bam_out"/$f.gtf | grep -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
-       rm listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param3" cut-off have been found in $f.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi      
     elif [ "$threshold" -eq "$param2" ]; then
        grep " transcript" "$bam_out"/$f.gtf | grep -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
-       rm listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param2" cut-off have been found in $f.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi       
     elif [ "$threshold" -eq "$param1" ]; then
        grep " transcript" "$bam_out"/$f.gtf | grep -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
-       rm listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param1" cut-off have been found in $f.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi       
     elif [ "$threshold" -eq "$param0" ]; then
-        mv "$bam_out"/$f.gtf "$bam_out"/$f.gtf.filtered.gtf
+       grep " transcript" "$bam_out"/$f.gtf | grep -e 'cov "0.000' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$f.gtf >"$bam_out"/$f.gtf.filtered.gtf
     else
         echo "Invalid coverage parameter. Please select a whole number between 0-5"
         exit
@@ -246,10 +293,17 @@ stringtie_SRA_multi()
     samtools sort -O BAM -T temp_files $f.sam -o "$bam_out"/$f.sorted.bam --threads $num_threads
     rm $f.sam
     stringtie -G $referenceannotation "$bam_out"/$f.sorted.bam -o "$bam_out"/$f.gtf -p $num_threads
-    coverge_cuffoff_SRA_multi  
-    cuffcompare "$bam_out"/$f.gtf.filtered.gtf -r $referenceannotation -o $f
-    mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+    coverge_cuffoff_SRA_multi
+    var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
+    if [ "$var" -eq 0 ]; then
+      rm listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf
+    else
+      cuffcompare "$bam_out"/$f.gtf.filtered.gtf -r $referenceannotation -o $f
+      rm listtoremove.txt
+      mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+    fi
 }
+
 
 cufflinks_SRA_multi()
 {
@@ -259,39 +313,64 @@ cufflinks_SRA_multi()
     mv "$bam_out"/transcripts.gtf "$bam_out"/$f.gtf
     mv "$bam_out"/isoforms.fpkm_tracking "$bam_out"/$f.isoforms.fpkm_tracking
     mv "$bam_out"/skipped.gtf  "$bam_out"/$f.skipped.gtf
-    coverge_cuffoff_SRA_multi  
-    cuffcompare "$bam_out"/$f.gtf.filtered.gtf -r $referenceannotation -o $f
-    mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"  
+    coverge_cuffoff_SRA_multi
+    var=$(grep -vFf listtoremove.txt "$bam_out"/$f.gtf.filtered.gtf | wc -l)
+    if [ "$var" -eq 0 ]; then
+      rm listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf
+    else
+      cuffcompare "$bam_out"/$f.gtf.filtered.gtf -r $referenceannotation -o $f
+      rm listtoremove.txt
+      mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+   fi
+
 }
 
 ##################
 ### No SRA #######
 ##################
 
+### Paired end #####
+
 coverge_cuffoff_non_SRA()
 {
     if [ "$threshold" -eq "$param5" ]; then
        grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "4.' -e 'cov "3.' -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf >"$bam_out"/$filename3.gtf.filtered.gtf
-       rm listtoremove.txt
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param5" cut-off have been found in $filename3.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi
     elif [ "$threshold" -eq "$param4" ]; then
        grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "3.' -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf >"$bam_out"/$filename3.gtf.filtered.gtf
-       rm listtoremove.txt
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param4" cut-off have been found in $filename3.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi
     elif [ "$threshold" -eq "$param3" ]; then
        grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf >"$bam_out"/$filename3.gtf.filtered.gtf
-       rm listtoremove.txt
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param3" cut-off have been found in $filename3.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi
     elif [ "$threshold" -eq "$param2" ]; then
        grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf >"$bam_out"/$filename3.gtf.filtered.gtf
-       rm listtoremove.txt
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param2" cut-off have been found in $filename3.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi
     elif [ "$threshold" -eq "$param1" ]; then
        grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf >"$bam_out"/$filename3.gtf.filtered.gtf
-       rm listtoremove.txt
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param1" cut-off have been found in $filename3.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi
     elif [ "$threshold" -eq "$param0" ]; then
-        mv "$bam_out"/$filename3.gtf "$bam_out"/$filename3.gtf.filtered.gtf
+       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "0.000' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf >"$bam_out"/$filename3.gtf.filtered.gtf
     else
         echo "Invalid coverage parameter. Please select a whole number between 0-5"
         exit
@@ -304,8 +383,100 @@ stringtie_non_SRA()
     rm $filename3.sam
     stringtie -G $referenceannotation "$bam_out"/$filename3.sorted.bam -o "$bam_out"/$filename3.gtf -p $num_threads
     coverge_cuffoff_non_SRA 
-    cuffcompare "$bam_out"/$filename3.gtf.filtered.gtf -r $referenceannotation -o $filename3
-    mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+    var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          rm listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf
+        else
+          cuffcompare "$bam_out"/$filename3.gtf.filtered.gtf -r $referenceannotation -o $filename3
+          rm listtoremove.txt
+          mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+       fi
+}
+
+cufflinks_non_SRA_single()
+{
+    samtools sort -O BAM -T temp_files $filename.sam -o "$bam_out"/$filename.sorted.bam --threads $num_threads
+    rm $filename.sam
+    cufflinks "$bam_out"/$filename.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
+    mv "$bam_out"/skipped.gtf "$bam_out"/$filename.skipped.gtf
+    mv "$bam_out"/transcripts.gtf "$bam_out"/$filename.gtf
+    mv "$bam_out"/isoforms.fpkm_tracking "$bam_out"/$filename.isoforms.fpkm_tracking
+    mv "$bam_out"/genes.fpkm_tracking "$bam_out"/$filename.genes.fpkm_tracking
+    coverge_cuffoff_non_SRA_single        
+    var=$(grep -vFf listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          rm listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf
+        else
+          cuffcompare "$bam_out"/$filename.gtf.filtered.gtf -r $referenceannotation -o $filename
+          rm listtoremove.txt
+          mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+       fi
+}
+
+
+### single end ####
+
+coverge_cuffoff_non_SRA_single()
+{
+    if [ "$threshold" -eq "$param5" ]; then
+       grep " transcript" "$bam_out"/$filename.gtf | grep -e 'cov "4.' -e 'cov "3.' -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$filename.gtf >"$bam_out"/$filename.gtf.filtered.gtf
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param5" cut-off have been found in $filename.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi       
+    elif [ "$threshold" -eq "$param4" ]; then
+       grep " transcript" "$bam_out"/$filename.gtf | grep -e 'cov "3.' -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$filename.gtf >"$bam_out"/$filename.gtf.filtered.gtf
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param4" cut-off have been found in $filename.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi
+    elif [ "$threshold" -eq "$param3" ]; then
+       grep " transcript" "$bam_out"/$filename.gtf | grep -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$filename.gtf >"$bam_out"/$filename.gtf.filtered.gtf
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param3" cut-off have been found in $filename.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi
+    elif [ "$threshold" -eq "$param2" ]; then
+       grep " transcript" "$bam_out"/$filename.gtf | grep -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$filename.gtf >"$bam_out"/$filename.gtf.filtered.gtf
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param2" cut-off have been found in $filename.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi
+    elif [ "$threshold" -eq "$param1" ]; then
+       grep " transcript" "$bam_out"/$filename.gtf | grep -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$filename.gtf >"$bam_out"/$filename.gtf.filtered.gtf
+       var=$(grep -vFf listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          echo No transcripts have FPKM values exceeding your "$param1" cut-off have been found in $filename.gtf.filtered.gtf. Try lowering your cut-off 1>&2
+       fi
+    elif [ "$threshold" -eq "$param0" ]; then
+       grep " transcript" "$bam_out"/$filename.gtf | grep -e 'cov "0.000' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep -vFf listtoremove.txt "$bam_out"/$filename.gtf >"$bam_out"/$filename.gtf.filtered.gtf
+    else
+        echo "Invalid coverage parameter. Please select a whole number between 0-5"
+        exit
+    fi
+}
+ 
+
+stringtie_non_SRA_single() 
+{
+    samtools sort -O BAM -T temp_files $filename.sam -o "$bam_out"/$filename.sorted.bam --threads $num_threads
+    rm $filename.sam
+    stringtie -G $referenceannotation "$bam_out"/$filename.sorted.bam -o "$bam_out"/$filename.gtf -p $num_threads
+    coverge_cuffoff_non_SRA_single
+    var=$(grep -vFf listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          rm listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf
+        else
+          cuffcompare "$bam_out"/$filename.gtf.filtered.gtf -r $referenceannotation -o $filename
+          rm listtoremove.txt
+          mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+       fi
 }
 
 cufflinks_non_SRA()
@@ -317,9 +488,15 @@ cufflinks_non_SRA()
     mv "$bam_out"/transcripts.gtf "$bam_out"/$filename3.gtf
     mv "$bam_out"/isoforms.fpkm_tracking "$bam_out"/$filename3.isoforms.fpkm_tracking
     mv "$bam_out"/genes.fpkm_tracking "$bam_out"/$filename3.genes.fpkm_tracking
-    coverge_cuffoff_non_SRA        
-    cuffcompare "$bam_out"/$filename3.gtf.filtered.gtf -r $referenceannotation -o $filename3
-    mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"  
+    coverge_cuffoff_non_SRA
+    var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
+       if [ "$var" -eq 0 ]; then
+          rm listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf
+        else
+          cuffcompare "$bam_out"/$filename3.gtf.filtered.gtf -r $referenceannotation -o $filename3
+          rm listtoremove.txt
+          mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+       fi  
 }
 
 ###############
@@ -328,8 +505,17 @@ cufflinks_non_SRA()
 
 cuff_merge_fun()
 {
-    ls "$bam_out"/*filtered.gtf | tr "\t" "\n" >> "$bam_out"/gtf_file.txt 
-    cuffmerge -o "$bam_out"/merged_out -g $referenceannotation "$bam_out"/gtf_file.txt -p $num_threads
+    if [ -f $bam_out/*filtered.gtf ]; then 
+      ls "$bam_out"/*filtered.gtf | tr "\t" "\n" >> "$bam_out"/gtf_file.txt
+      numb=$(wc -l "$bam_out"/gtf_file.txt)
+      if [ "$numb" -gt 1 ]; then  
+        cuffmerge -o "$bam_out"/merged_out -g $referenceannotation "$bam_out"/gtf_file.txt -p $num_threads
+      else
+        echo "Cuffmerge needs more than 1 filtered.gtf file" 1>&2
+      fi
+    else
+      echo "No filtered.gtf files are found for cuffmerge" 1>&2
+    fi
 }
 
 # ############################################################################################################################################################################################################################
@@ -389,6 +575,8 @@ if [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ] &
       elif [[ "$extension" =~ "fastq.gz" ]]; then
         filename=$(basename "$f" ".fastq.gz")
         filename2=${filename/_R1/_R2}
+	      filename3=$(echo $filename | sed 's/_R1//')
+
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -S $filename3.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33
             stringtie_non_SRA
@@ -411,6 +599,8 @@ if [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ] &
       elif [[ "$extension" =~ "fq" ]]; then
         filename=$(basename "$f" ".fq")
         filename2=${filename/_R1/_R2}
+	      filename3=$(echo $filename | sed 's/_R1//')
+
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -S $filename3.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33
             stringtie_non_SRA
@@ -433,6 +623,8 @@ if [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ] &
       elif [[ "$extension" =~ "fastq" ]]; then
         filename=$(basename "$f" ".fastq")
         filename2=${filename/_R1/_R2}
+	      filename3=$(echo $filename | sed 's/_R1//')
+
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -S $filename3.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33
             stringtie_non_SRA
@@ -500,6 +692,8 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
       elif [[ "$extension" =~ "fastq.gz" ]]; then
         filename=$(basename "$f" ".fastq.gz")
         filename2=${filename/_R1/_R2}
+	      filename3=$(echo $filename | sed 's/_R1//')
+
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -S $filename3.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
             stringtie_non_SRA
@@ -522,6 +716,8 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
       elif [[ "$extension" =~ "fq" ]]; then
         filename=$(basename "$f" ".fq")
         filename2=${filename/_R1/_R2}
+	      filename3=$(echo $filename | sed 's/_R1//')
+
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -S $filename3.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
             stringtie_non_SRA
@@ -544,6 +740,8 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
       elif [[ "$extension" =~ "fastq" ]]; then
         filename=$(basename "$f" ".fastq")
         filename2=${filename/_R1/_R2}
+	      filename3=$(echo $filename | sed 's/_R1//')
+
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -S $filename3.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
             stringtie_non_SRA
@@ -614,6 +812,8 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ]
       elif [[ "$extension" =~ "fastq.gz" ]]; then
         filename=$(basename "$f" ".fastq.gz")
         filename2=${filename/_R1/_R2}
+	      filename3=$(echo $filename | sed 's/_R1//')
+
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -S $filename3.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33
             cufflinks_non_SRA
@@ -636,6 +836,8 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ]
       elif [[ "$extension" =~ "fq" ]]; then
         filename=$(basename "$f" ".fq")
         filename2=${filename/_R1/_R2}
+	      filename3=$(echo $filename | sed 's/_R1//')
+
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -S $filename3.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33
             cufflinks_non_SRA
@@ -658,6 +860,8 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ]
       elif [[ "$extension" =~ "fastq" ]]; then
         filename=$(basename "$f" ".fastq")
         filename2=${filename/_R1/_R2}
+	      filename3=$(echo $filename | sed 's/_R1//')
+
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -S $filename3.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33
             cufflinks_non_SRA
@@ -726,6 +930,8 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
       elif [[ "$extension" =~ "fastq.gz" ]]; then
         filename=$(basename "$f" ".fastq.gz")
         filename2=${filename/_R1/_R2}
+	      filename3=$(echo $filename | sed 's/_R1//')
+
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -S $filename3.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
             cufflinks_non_SRA
@@ -748,6 +954,8 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
       elif [[ "$extension" =~ "fq" ]]; then
         filename=$(basename "$f" ".fq")
         filename2=${filename/_R1/_R2}
+	      filename3=$(echo $filename | sed 's/_R1//')
+
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -S $filename3.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
             cufflinks_non_SRA
@@ -770,6 +978,8 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
       elif [[ "$extension" =~ "fastq" ]]; then
         filename=$(basename "$f" ".fastq")
         filename2=${filename/_R1/_R2}
+	      filename3=$(echo $filename | sed 's/_R1//')
+
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -S $filename3.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
             cufflinks_non_SRA
@@ -816,26 +1026,30 @@ elif [ ! -z "$single_reads" ] && [ "$quality_33" != 0 ] && [ "$tra_as" != 0 ] &&
     numb=$(ls "${single_reads[@]}" | wc -l)
     for f in "${single_reads[@]}"; do
       if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33
-        stringtie_non_SRA
+        stringtie_non_SRA_single
         rm $fbname*
         exit
       elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33
-        stringtie_non_SRA
+        stringtie_non_SRA_single
         rm $fbname*
         echo "cuffmerge only works with more than one file"
         exit
       elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33
-        stringtie_non_SRA   
+        stringtie_non_SRA_single   
       elif [ $numb -gt 1 ] && [ "$cuff_merge" != 0 ]; then
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33
-        stringtie_non_SRA
+        stringtie_non_SRA_single
       fi 
     done
 
@@ -852,26 +1066,30 @@ elif [ ! -z "$single_reads" ] && [ "$quality_64" != 0 ] && [ "$tra_as" != 0 ] &&
     numb=$(ls "${single_reads[@]}" | wc -l)
     for f in "${single_reads[@]}"; do
       if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
-        stringtie_non_SRA
+        stringtie_non_SRA_single
         rm $fbname*
         exit 
       elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
-        stringtie_non_SRA
+        stringtie_non_SRA_single
         rm $fbname*
         echo "cuffmerge only works with more than one file"
         exit  
       elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
-        stringtie_non_SRA
+        stringtie_non_SRA_single
       elif [ $numb -gt 1 ] && [ "$cuff_merge" != 0 ]; then
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
-        stringtie_non_SRA
+        stringtie_non_SRA_single
       fi 
     done
     
@@ -883,31 +1101,37 @@ elif [ ! -z "$single_reads" ] && [ "$quality_64" != 0 ] && [ "$tra_as" != 0 ] &&
 
 # Cufflinks
 
+# Phred 33
+
 elif [ ! -z "$single_reads" ] && [ "$quality_33" != 0 ] && [ "$tra_as" == 0 ] && [ "$tra_cuff" != 0 ]; then
     mkdir "$bam_out"
     numb=$(ls "${single_reads[@]}" | wc -l)
     for f in "${single_reads[@]}"; do
       if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then 
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred33
-        cufflinks_non_SRA
+        cufflinks_non_SRA_single
         rm $fbname*
         exit
       elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then 
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred33
-        cufflinks_non_SRA
+        cufflinks_non_SRA_single
         rm $fbname*
         echo "cuffmerge only works with more than one file"
         exit  
       elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred33
-        cufflinks_non_SRA
+        cufflinks_non_SRA_single
       elif [ $numb -gt 1 ] && [ "$cuff_merge" != 0 ]; then
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred33
-        cufflinks_non_SRA
+        cufflinks_non_SRA_single
       fi          
     done
     
@@ -917,32 +1141,37 @@ elif [ ! -z "$single_reads" ] && [ "$quality_33" != 0 ] && [ "$tra_as" == 0 ] &&
       cuff_merge_fun
     fi
 
+# Phred 33
 
 elif [ ! -z "$single_reads" ] && [ "$quality_64" != 0 ] && [ "$tra_as" == 0 ] && [ "$tra_cuff" != 0 ]; then
     mkdir "$bam_out"
     numb=$(ls "${single_reads[@]}" | wc -l)
     for f in "${single_reads[@]}"; do
       if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then 
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred64
-        cufflinks_non_SRA
+        cufflinks_non_SRA_single
         rm $fbname*
         exit
       elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then 
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred64
-        cufflinks_non_SRA
+        cufflinks_non_SRA_single
         rm $fbname*
         echo "cuffmerge only works with more than one file"
         exit  
       elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred64
-        cufflinks_non_SRA
+        cufflinks_non_SRA_single
       elif [ $numb -gt 1 ] && [ "$cuff_merge" != 0 ]; then
-        filename=$(basename "$f")
+        extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
+        filename=$(basename "$f" ".$extension")
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -S $filename.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred64
-        cufflinks_non_SRA
+        cufflinks_non_SRA_single
       fi          
     done
 
