@@ -503,17 +503,19 @@ cufflinks_non_SRA()
 
 cuff_merge_fun()
 {
-    if [ -f $bam_out/*filtered.gtf ]; then 
+    files="$bam_out"/*filtered.gtf
+    if [ ${#files[@]} -gt 0 ]; then
       ls "$bam_out"/*filtered.gtf | tr "\t" "\n" >> "$bam_out"/gtf_file.txt
-      numb=$(wc -l "$bam_out"/gtf_file.txt)
+      numb=$(cat "$bam_out"/gtf_file.txt | wc -l)
       if [ "$numb" -gt 1 ]; then  
         cuffmerge -o "$bam_out"/merged_out -g $referenceannotation "$bam_out"/gtf_file.txt -p $num_threads
+        "$bam_out"/gtf_file.txt
       else
         echo "Cuffmerge needs more than 1 filtered.gtf file" 1>&2
       fi
     else
       echo "No filtered.gtf files are found for cuffmerge" 1>&2
-    fi
+    fi  
 }
 
 # ############################################################################################################################################################################################################################
@@ -1204,7 +1206,7 @@ elif [ ! -z $sra_id ] && [ "$quality_33" != 0 ] && [ "$tra_as" != 0 ] && [ "$tra
     hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $sra_id -S $sra_id.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33
     stringtie_SRA_single
     if [ "$cuff_merge" != 0 ]; then
-      echo "cuffmerge only works with more than one SRA accesions. Use File containing SRA id's option to user cuffmerge"
+      echo "cuffmerge only works with more than one SRA accesions. Use File containing SRA id's option to use cuffmerge"
     fi  
   fi
 
@@ -1227,7 +1229,7 @@ elif [ ! -z $sra_id ] && [ "$quality_64" != 0 ] && [ "$tra_as" != 0 ] && [ "$tra
     hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $sra_id -S $sra_id.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
     stringtie_SRA_single
     if [ "$cuff_merge" != 0 ]; then
-      echo "cuffmerge only works with more than one SRA accesions. Use File containing SRA id's option to user cuffmerge"
+      echo "cuffmerge only works with more than one SRA accesions. Use File containing SRA id's option to use cuffmerge"
     fi
   fi 
 
@@ -1252,7 +1254,7 @@ elif [ ! -z $sra_id ] && [ "$quality_33" != 0 ] && [ "$tra_as" == 0 ] && [ "$tra
     hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $sra_id -S $sra_id.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred33
     cufflinks_SRA_single
     if [ "$cuff_merge" != 0 ]; then
-      echo "cuffmerge only works with more than one SRA accesions. Use File containing SRA id's option to user cuffmerge"
+      echo "cuffmerge only works with more than one SRA accesions. Use File containing SRA id's option to use cuffmerge"
     fi
   fi
 
@@ -1275,7 +1277,7 @@ elif [ ! -z $sra_id ] && [ "$quality_64" != 0 ] && [ "$tra_as" == 0 ] && [ "$tra
     hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $sra_id -S $sra_id.sam -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred64
     cufflinks_SRA_single
     if [ "$cuff_merge" != 0 ]; then
-      echo "cuffmerge only works with more than one SRA accesions. Use File containing SRA id's option to user cuffmerge"
+      echo "cuffmerge only works with more than one SRA accesions. Use File containing SRA id's option to use cuffmerge"
     fi
   fi
 fi
