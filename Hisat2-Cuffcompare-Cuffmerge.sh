@@ -1007,7 +1007,6 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
     done
 
     if [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
-      rm $fbname*
       exit
     elif [ $numb -gt 1 ] && [ "$cuff_merge" != 0 ]; then
       cuff_merge_fun
@@ -1055,7 +1054,6 @@ elif [ ! -z "$single_reads" ] && [ "$quality_33" != 0 ] && [ "$tra_as" != 0 ] &&
     done
 
     if [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
-      rm $fbname*
       exit
     elif [ $numb -gt 1 ] && [ "$cuff_merge" != 0 ]; then
       cuff_merge_fun
@@ -1096,7 +1094,6 @@ elif [ ! -z "$single_reads" ] && [ "$quality_64" != 0 ] && [ "$tra_as" != 0 ] &&
     done
     
     if [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
-      rm $fbname*
       exit
     elif [ $numb -gt 1 ] && [ "$cuff_merge" != 0 ]; then
       cuff_merge_fun
@@ -1139,7 +1136,6 @@ elif [ ! -z "$single_reads" ] && [ "$quality_33" != 0 ] && [ "$tra_as" == 0 ] &&
     done
     
     if [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
-      rm $fbname*
       exit
     elif [ $numb -gt 1 ] && [ "$cuff_merge" != 0 ]; then
       cuff_merge_fun
@@ -1180,7 +1176,6 @@ elif [ ! -z "$single_reads" ] && [ "$quality_64" != 0 ] && [ "$tra_as" == 0 ] &&
     done
 
     if [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
-      rm $fbname*
       exit
     elif [ $numb -gt 1 ] && [ "$cuff_merge" != 0 ]; then
       cuff_merge_fun
@@ -1202,7 +1197,6 @@ elif [ ! -z $sra_id ] && [ "$quality_33" != 0 ] && [ "$tra_as" != 0 ] && [ "$tra
       stringtie_SRA_multi      
       done < "$sra_id" 
       if [ "$cuff_merge" == 0 ]; then
-        rm $fbname*
         exit
       elif [ "$cuff_merge" != 0 ]; then
         cuff_merge_fun
@@ -1226,7 +1220,6 @@ elif [ ! -z $sra_id ] && [ "$quality_64" != 0 ] && [ "$tra_as" != 0 ] && [ "$tra
       stringtie_SRA_multi      
       done < "$sra_id"
       if [ "$cuff_merge" == 0 ]; then
-        rm $fbname*
         exit
       elif [ "$cuff_merge" != 0 ]; then
         cuff_merge_fun
@@ -1252,7 +1245,6 @@ elif [ ! -z $sra_id ] && [ "$quality_33" != 0 ] && [ "$tra_as" == 0 ] && [ "$tra
       cufflinks_SRA_multi      
       done < "$sra_id"
       if [ "$cuff_merge" == 0 ]; then
-        rm $fbname*
         exit
       elif [ "$cuff_merge" != 0 ]; then
         cuff_merge_fun
@@ -1276,7 +1268,6 @@ elif [ ! -z $sra_id ] && [ "$quality_64" != 0 ] && [ "$tra_as" == 0 ] && [ "$tra
       cufflinks_SRA_multi      
       done < "$sra_id"
       if [ "$cuff_merge" == 0 ]; then
-        rm $fbname*
         exit
       elif [ "$cuff_merge" != 0 ]; then
         cuff_merge_fun
