@@ -7,9 +7,14 @@ RUN apt-get update && apt-get install -y build-essential \
                                          python \
                                          wget \
                                          unzip \
-					 build-essential \
-        				 zlib1g-dev \
-        				 libncurses5-dev
+					 					 build-essential \
+        				 				 zlib1g-dev \
+        				 				 libncurses5-dev \
+        				 				 software-properties-common \
+
+RUN add-apt-repository -y ppa:openjdk-r/ppa
+RUN apt-get update
+RUN apt-get install -y openjdk-8-jdk
 
 ENV BINPATH /usr/bin
 
@@ -43,6 +48,12 @@ RUN wget https://github.com/samtools/samtools/releases/download/1.3.1/samtools-1
 RUN tar xvf samtools-1.3.1.tar.bz2
 WORKDIR /samtools-1.3.1
 RUN make
+
+# Picard
+WORKDIR /
+RUN wget https://github.com/broadinstitute/picard/releases/download/2.10.10/picard.jar 
+RUN mv picard.jar $BINPATH
+WORKDIR / 
 
 # Wrapper script
 ADD Hisat2-Cuffcompare-Cuffmerge.sh $BINPATH

@@ -204,7 +204,7 @@ coverge_cuffoff_SRA_single()
 
 stringtie_SRA_single()
 {
-    samtools sort -O BAM -T temp_files $sra_id.sam -o "$bam_out"/$sra_id.sorted.bam --threads $num_threads
+    java -jar picard.jar SortSam I=$sra_id.sam O="$bam_out"/$sra_id.sorted.bam SORT_ORDER=coordinate
     rm $sra_id.sam
     stringtie -G $referenceannotation "$bam_out"/$sra_id.sorted.bam -o "$bam_out"/$sra_id.gtf -p $num_threads
     coverge_cuffoff_SRA_single  
@@ -220,7 +220,7 @@ stringtie_SRA_single()
 
 cufflinks_SRA_single()
 {
-    samtools sort -O BAM -T temp_files $sra_id.sam -o "$bam_out"/$sra_id.sorted.bam --threads $num_threads
+    java -jar picard.jar SortSam I=$sra_id.sam O="$bam_out"/$sra_id.sorted.bam SORT_ORDER=coordinate
     rm $sra_id.sam
     cufflinks "$bam_out"/$sra_id.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
     mv "$bam_out"/transcripts.gtf "$bam_out"/$sra_id.gtf
@@ -289,7 +289,7 @@ coverge_cuffoff_SRA_multi()
 
 stringtie_SRA_multi()
 {
-    samtools sort -O BAM -T temp_files $f.sam -o "$bam_out"/$f.sorted.bam --threads $num_threads
+    java -jar picard.jar SortSam I=$f.sam O="$bam_out"/$f.sorted.bam SORT_ORDER=coordinate
     rm $f.sam
     stringtie -G $referenceannotation "$bam_out"/$f.sorted.bam -o "$bam_out"/$f.gtf -p $num_threads
     coverge_cuffoff_SRA_multi
@@ -305,7 +305,7 @@ stringtie_SRA_multi()
 
 cufflinks_SRA_multi()
 {
-    samtools sort -O BAM -T temp_files $f.sam -o "$bam_out"/$f.sorted.bam --threads $num_threads
+    java -jar picard.jar SortSam I=$f.sam O="$bam_out"/$f.sorted.bam SORT_ORDER=coordinate
     rm $f.sam
     cufflinks "$bam_out"/$f.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
     mv "$bam_out"/transcripts.gtf "$bam_out"/$f.gtf
@@ -377,7 +377,7 @@ coverge_cuffoff_non_SRA()
 
 stringtie_non_SRA() 
 {
-    samtools sort -O BAM -T temp_files $filename3.sam -o "$bam_out"/$filename3.sorted.bam --threads $num_threads
+    java -jar picard.jar SortSam I=$filename3.sam O="$bam_out"/$filename3.sorted.bam SORT_ORDER=coordinate
     rm $filename3.sam
     stringtie -G $referenceannotation "$bam_out"/$filename3.sorted.bam -o "$bam_out"/$filename3.gtf -p $num_threads
     coverge_cuffoff_non_SRA 
@@ -391,26 +391,25 @@ stringtie_non_SRA()
        fi
 }
 
-cufflinks_non_SRA_single()
+cufflinks_non_SRA()
 {
-    samtools sort -O BAM -T temp_files $filename.sam -o "$bam_out"/$filename.sorted.bam --threads $num_threads
-    rm $filename.sam
-    cufflinks "$bam_out"/$filename.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
-    mv "$bam_out"/skipped.gtf "$bam_out"/$filename.skipped.gtf
-    mv "$bam_out"/transcripts.gtf "$bam_out"/$filename.gtf
-    mv "$bam_out"/isoforms.fpkm_tracking "$bam_out"/$filename.isoforms.fpkm_tracking
-    mv "$bam_out"/genes.fpkm_tracking "$bam_out"/$filename.genes.fpkm_tracking
-    coverge_cuffoff_non_SRA_single        
-    var=$(grep -vFf listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf | wc -l)
+    java -jar picard.jar SortSam I=$filename3.sam O="$bam_out"/$filename3.sorted.bam SORT_ORDER=coordinate
+    rm $filename3.sam
+    cufflinks "$bam_out"/$filename3.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
+    mv "$bam_out"/skipped.gtf "$bam_out"/$filename3.skipped.gtf
+    mv "$bam_out"/transcripts.gtf "$bam_out"/$filename3.gtf
+    mv "$bam_out"/isoforms.fpkm_tracking "$bam_out"/$filename3.isoforms.fpkm_tracking
+    mv "$bam_out"/genes.fpkm_tracking "$bam_out"/$filename3.genes.fpkm_tracking
+    coverge_cuffoff_non_SRA
+    var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
        if [ "$var" -eq 0 ]; then
-          rm listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf
+          rm listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf
         else
-          cuffcompare "$bam_out"/$filename.gtf.filtered.gtf -r $referenceannotation -o $filename
+          cuffcompare "$bam_out"/$filename3.gtf.filtered.gtf -r $referenceannotation -o $filename3
           rm listtoremove.txt
           mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
-       fi
+       fi  
 }
-
 
 ### single end ####
 
@@ -463,7 +462,7 @@ coverge_cuffoff_non_SRA_single()
 
 stringtie_non_SRA_single() 
 {
-    samtools sort -O BAM -T temp_files $filename.sam -o "$bam_out"/$filename.sorted.bam --threads $num_threads
+    java -jar picard.jar SortSam I=$filename.sam O="$bam_out"/$filename.sorted.bam SORT_ORDER=coordinate
     rm $filename.sam
     stringtie -G $referenceannotation "$bam_out"/$filename.sorted.bam -o "$bam_out"/$filename.gtf -p $num_threads
     coverge_cuffoff_non_SRA_single
@@ -477,25 +476,26 @@ stringtie_non_SRA_single()
        fi
 }
 
-cufflinks_non_SRA()
+cufflinks_non_SRA_single()
 {
-    samtools sort -O BAM -T temp_files $filename3.sam -o "$bam_out"/$filename3.sorted.bam --threads $num_threads
-    rm $filename3.sam
-    cufflinks "$bam_out"/$filename3.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
-    mv "$bam_out"/skipped.gtf "$bam_out"/$filename3.skipped.gtf
-    mv "$bam_out"/transcripts.gtf "$bam_out"/$filename3.gtf
-    mv "$bam_out"/isoforms.fpkm_tracking "$bam_out"/$filename3.isoforms.fpkm_tracking
-    mv "$bam_out"/genes.fpkm_tracking "$bam_out"/$filename3.genes.fpkm_tracking
-    coverge_cuffoff_non_SRA
-    var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
+    java -jar picard.jar SortSam I=$filename.sam O="$bam_out"/$filename.sorted.bam SORT_ORDER=coordinate
+    rm $filename.sam
+    cufflinks "$bam_out"/$filename.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
+    mv "$bam_out"/skipped.gtf "$bam_out"/$filename.skipped.gtf
+    mv "$bam_out"/transcripts.gtf "$bam_out"/$filename.gtf
+    mv "$bam_out"/isoforms.fpkm_tracking "$bam_out"/$filename.isoforms.fpkm_tracking
+    mv "$bam_out"/genes.fpkm_tracking "$bam_out"/$filename.genes.fpkm_tracking
+    coverge_cuffoff_non_SRA_single        
+    var=$(grep -vFf listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf | wc -l)
        if [ "$var" -eq 0 ]; then
-          rm listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf
+          rm listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf
         else
-          cuffcompare "$bam_out"/$filename3.gtf.filtered.gtf -r $referenceannotation -o $filename3
+          cuffcompare "$bam_out"/$filename.gtf.filtered.gtf -r $referenceannotation -o $filename
           rm listtoremove.txt
           mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
-       fi  
+       fi
 }
+
 
 ###############
 ## cuffmerge ##
