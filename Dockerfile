@@ -7,10 +7,10 @@ RUN apt-get update && apt-get install -y build-essential \
                                          python \
                                          wget \
                                          unzip \
-					 					 build-essential \
-        				 				 zlib1g-dev \
-        				 				 libncurses5-dev \
-        				 				 software-properties-common \
+					 build-essential \
+        				 zlib1g-dev \
+        				 libncurses5-dev \
+        				 software-properties-common
 
 RUN add-apt-repository -y ppa:openjdk-r/ppa
 RUN apt-get update
