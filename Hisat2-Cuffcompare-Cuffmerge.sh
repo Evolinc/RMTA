@@ -204,7 +204,7 @@ coverge_cuffoff_SRA_single()
 
 stringtie_SRA_single()
 {
-    java -jar picard.jar SortSam I=$sra_id.sam O="$bam_out"/$sra_id.sorted.bam SORT_ORDER=coordinate
+    java -jar /usr/bin/picard.jar SortSam I=$sra_id.sam O="$bam_out"/$sra_id.sorted.bam SORT_ORDER=coordinate
     rm $sra_id.sam
     stringtie -G $referenceannotation "$bam_out"/$sra_id.sorted.bam -o "$bam_out"/$sra_id.gtf -p $num_threads
     coverge_cuffoff_SRA_single  
@@ -220,7 +220,7 @@ stringtie_SRA_single()
 
 cufflinks_SRA_single()
 {
-    java -jar picard.jar SortSam I=$sra_id.sam O="$bam_out"/$sra_id.sorted.bam SORT_ORDER=coordinate
+    java -jar /usr/bin/picard.jar SortSam I=$sra_id.sam O="$bam_out"/$sra_id.sorted.bam SORT_ORDER=coordinate
     rm $sra_id.sam
     cufflinks "$bam_out"/$sra_id.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
     mv "$bam_out"/transcripts.gtf "$bam_out"/$sra_id.gtf
@@ -289,7 +289,7 @@ coverge_cuffoff_SRA_multi()
 
 stringtie_SRA_multi()
 {
-    java -jar picard.jar SortSam I=$f.sam O="$bam_out"/$f.sorted.bam SORT_ORDER=coordinate
+    java -jar /usr/bin/picard.jar SortSam I=$f.sam O="$bam_out"/$f.sorted.bam SORT_ORDER=coordinate
     rm $f.sam
     stringtie -G $referenceannotation "$bam_out"/$f.sorted.bam -o "$bam_out"/$f.gtf -p $num_threads
     coverge_cuffoff_SRA_multi
@@ -305,7 +305,7 @@ stringtie_SRA_multi()
 
 cufflinks_SRA_multi()
 {
-    java -jar picard.jar SortSam I=$f.sam O="$bam_out"/$f.sorted.bam SORT_ORDER=coordinate
+    java -jar /usr/bin/picard.jar SortSam I=$f.sam O="$bam_out"/$f.sorted.bam SORT_ORDER=coordinate
     rm $f.sam
     cufflinks "$bam_out"/$f.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
     mv "$bam_out"/transcripts.gtf "$bam_out"/$f.gtf
@@ -377,7 +377,7 @@ coverge_cuffoff_non_SRA()
 
 stringtie_non_SRA() 
 {
-    java -jar picard.jar SortSam I=$filename3.sam O="$bam_out"/$filename3.sorted.bam SORT_ORDER=coordinate
+    java -jar /usr/bin/picard.jar SortSam I=$filename3.sam O="$bam_out"/$filename3.sorted.bam SORT_ORDER=coordinate
     rm $filename3.sam
     stringtie -G $referenceannotation "$bam_out"/$filename3.sorted.bam -o "$bam_out"/$filename3.gtf -p $num_threads
     coverge_cuffoff_non_SRA 
@@ -393,7 +393,7 @@ stringtie_non_SRA()
 
 cufflinks_non_SRA()
 {
-    java -jar picard.jar SortSam I=$filename3.sam O="$bam_out"/$filename3.sorted.bam SORT_ORDER=coordinate
+    java -jar /usr/bin/picard.jar SortSam I=$filename3.sam O="$bam_out"/$filename3.sorted.bam SORT_ORDER=coordinate
     rm $filename3.sam
     cufflinks "$bam_out"/$filename3.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
     mv "$bam_out"/skipped.gtf "$bam_out"/$filename3.skipped.gtf
@@ -462,7 +462,7 @@ coverge_cuffoff_non_SRA_single()
 
 stringtie_non_SRA_single() 
 {
-    java -jar picard.jar SortSam I=$filename.sam O="$bam_out"/$filename.sorted.bam SORT_ORDER=coordinate
+    java -jar /usr/bin/picard.jar SortSam I=$filename.sam O="$bam_out"/$filename.sorted.bam SORT_ORDER=coordinate
     rm $filename.sam
     stringtie -G $referenceannotation "$bam_out"/$filename.sorted.bam -o "$bam_out"/$filename.gtf -p $num_threads
     coverge_cuffoff_non_SRA_single
@@ -478,7 +478,7 @@ stringtie_non_SRA_single()
 
 cufflinks_non_SRA_single()
 {
-    java -jar picard.jar SortSam I=$filename.sam O="$bam_out"/$filename.sorted.bam SORT_ORDER=coordinate
+    java -jar /usr/bin/picard.jar SortSam I=$filename.sam O="$bam_out"/$filename.sorted.bam SORT_ORDER=coordinate
     rm $filename.sam
     cufflinks "$bam_out"/$filename.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
     mv "$bam_out"/skipped.gtf "$bam_out"/$filename.skipped.gtf
