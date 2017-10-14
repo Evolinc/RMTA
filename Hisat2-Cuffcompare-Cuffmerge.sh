@@ -557,11 +557,13 @@ if [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ] &
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -581,11 +583,13 @@ if [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ] &
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit    
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -605,11 +609,13 @@ if [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ] &
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -629,11 +635,13 @@ if [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ] &
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -674,11 +682,13 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit    
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -698,11 +708,13 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit    
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -722,11 +734,13 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit    
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -746,11 +760,13 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit    
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -794,11 +810,13 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ]
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit    
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -818,11 +836,13 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ]
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit    
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -842,6 +862,7 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ]
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
@@ -866,11 +887,13 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ]
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit    
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -912,11 +935,13 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit    
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -936,11 +961,13 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit    
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -960,11 +987,13 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit    
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -984,11 +1013,13 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename3.bam -
             cufflinks_non_SRA
             rm $fbname*
+            rm -r temp
             echo "cuffmerge only works with more than one file"
             exit    
         elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -1001,6 +1032,7 @@ elif [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_64" != 0 ]
 
       elif [ "$extension" != "fastq" ] || [ "$extension" != "fq" ] || [ "$extension" != "fastq.gz" ] || [ "$extension" != "fq.gz" ]; then
         rm $fbname*
+        rm -r temp
         echo "The extension" "$extension" "is not supported. Only .fq, .fq.gz, .fastq, .fastq.gz are only supported" 1>&2        
         exit 64
       fi 
@@ -1031,6 +1063,7 @@ elif [ ! -z "$single_reads" ] && [ "$quality_33" != 0 ] && [ "$tra_as" != 0 ] &&
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename.bam -
         stringtie_non_SRA_single
         rm $fbname*
+        rm -r temp
         exit
       elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
         extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
@@ -1038,6 +1071,7 @@ elif [ ! -z "$single_reads" ] && [ "$quality_33" != 0 ] && [ "$tra_as" != 0 ] &&
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename.bam -
         stringtie_non_SRA_single
         rm $fbname*
+        rm -r temp
         echo "cuffmerge only works with more than one file"
         exit
       elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -1071,6 +1105,7 @@ elif [ ! -z "$single_reads" ] && [ "$quality_64" != 0 ] && [ "$tra_as" != 0 ] &&
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename.bam -
         stringtie_non_SRA_single
         rm $fbname*
+        rm -r temp
         exit 
       elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
         extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
@@ -1078,6 +1113,7 @@ elif [ ! -z "$single_reads" ] && [ "$quality_64" != 0 ] && [ "$tra_as" != 0 ] &&
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 | samtools view -Sbo $filename.bam -
         stringtie_non_SRA_single
         rm $fbname*
+        rm -r temp
         echo "cuffmerge only works with more than one file"
         exit  
       elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -1113,6 +1149,7 @@ elif [ ! -z "$single_reads" ] && [ "$quality_33" != 0 ] && [ "$tra_as" == 0 ] &&
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred33 | samtools view -Sbo $filename.bam -
         cufflinks_non_SRA_single
         rm $fbname*
+        rm -r temp
         exit
       elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then 
         extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
@@ -1120,6 +1157,7 @@ elif [ ! -z "$single_reads" ] && [ "$quality_33" != 0 ] && [ "$tra_as" == 0 ] &&
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred33 | samtools view -Sbo $filename.bam -
         cufflinks_non_SRA_single
         rm $fbname*
+        rm -r temp
         echo "cuffmerge only works with more than one file"
         exit  
       elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
@@ -1153,6 +1191,7 @@ elif [ ! -z "$single_reads" ] && [ "$quality_64" != 0 ] && [ "$tra_as" == 0 ] &&
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred64 | samtools view -Sbo $filename.bam -
         cufflinks_non_SRA_single
         rm $fbname*
+        rm -r temp
         exit
       elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then 
         extension=$(echo "$f" | sed -r 's/.*(fq|fq.gz|fastq|fastq.gz)$/\1/')
@@ -1160,6 +1199,7 @@ elif [ ! -z "$single_reads" ] && [ "$quality_64" != 0 ] && [ "$tra_as" == 0 ] &&
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta-cufflinks --phred64 | samtools view -Sbo $filename.bam -
         cufflinks_non_SRA_single
         rm $fbname*
+        rm -r temp
         echo "cuffmerge only works with more than one file"
         exit  
       elif [ $numb -gt 1 ] && [ "$cuff_merge" == 0 ]; then
