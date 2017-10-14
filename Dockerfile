@@ -51,9 +51,9 @@ RUN make
 
 # Picard
 WORKDIR /
-RUN wget https://github.com/broadinstitute/picard/releases/download/2.10.10/picard.jar 
-RUN mv picard.jar $BINPATH
-WORKDIR / 
+RUN wget https://github.com/lomereiter/sambamba/releases/download/v0.6.6/sambamba_v0.6.6_linux.tar.bz2
+RUN tar xvf sambamba_v0.6.6_linux.tar.bz2
+RUN mv sambamba_v0.6.6 /usr/bin
 
 # Wrapper script
 ADD Hisat2-Cuffcompare-Cuffmerge.sh $BINPATH
