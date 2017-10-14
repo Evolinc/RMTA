@@ -289,7 +289,7 @@ coverge_cuffoff_SRA_multi()
 
 stringtie_SRA_multi()
 {
-    sambamba_v0.6.6 sort -t $num_threads -o "$bam_out"/$f.sorted.bam $filename.bam
+    sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $filename.bam
     rm $f.bam
     stringtie -G $referenceannotation "$bam_out"/$f.sorted.bam -o "$bam_out"/$f.gtf -p $num_threads
     coverge_cuffoff_SRA_multi
@@ -305,7 +305,7 @@ stringtie_SRA_multi()
 
 cufflinks_SRA_multi()
 {
-    sambamba_v0.6.6 sort -t $num_threads -o "$bam_out"/$f.sorted.bam $filename.bam
+    sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $filename.bam
     rm $f.bam
     cufflinks "$bam_out"/$f.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
     mv "$bam_out"/transcripts.gtf "$bam_out"/$f.gtf
@@ -377,7 +377,7 @@ coverge_cuffoff_non_SRA()
 
 stringtie_non_SRA() 
 {
-    sambamba_v0.6.6 sort -t $num_threads -o "$bam_out"/$filename3.sorted.bam $filename3.bam
+    sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$filename3.sorted.bam $filename3.bam
     rm $filename3.bam
     stringtie -G $referenceannotation "$bam_out"/$filename3.sorted.bam -o "$bam_out"/$filename3.gtf -p $num_threads
     coverge_cuffoff_non_SRA 
@@ -393,7 +393,7 @@ stringtie_non_SRA()
 
 cufflinks_non_SRA()
 {
-    sambamba_v0.6.6 sort -t $num_threads -o "$bam_out"/$filename3.sorted.bam $filename3.bam
+    sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$filename3.sorted.bam $filename3.bam
     $filename3.bam
     cufflinks "$bam_out"/$filename3.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
     mv "$bam_out"/skipped.gtf "$bam_out"/$filename3.skipped.gtf
@@ -462,7 +462,7 @@ coverge_cuffoff_non_SRA_single()
 
 stringtie_non_SRA_single() 
 {
-    sambamba_v0.6.6 sort -t $num_threads -o "$bam_out"/$filename.sorted.bam $filename.bam
+    sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$filename.sorted.bam $filename.bam
     rm $filename.bam
     stringtie -G $referenceannotation "$bam_out"/$filename.sorted.bam -o "$bam_out"/$filename.gtf -p $num_threads
     coverge_cuffoff_non_SRA_single
@@ -478,7 +478,7 @@ stringtie_non_SRA_single()
 
 cufflinks_non_SRA_single()
 {
-    sambamba_v0.6.6 sort -t $num_threads -o "$bam_out"/$filename.sorted.bam $filename.bam
+    sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$filename.sorted.bam $filename.bam
     rm $filename.bam
     cufflinks "$bam_out"/$filename.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
     mv "$bam_out"/skipped.gtf "$bam_out"/$filename.skipped.gtf
@@ -1284,3 +1284,4 @@ fi
 
 # Clean up the reference genomes
 rm $fbname*
+rm -r temp
