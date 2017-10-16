@@ -204,7 +204,7 @@ coverge_cuffoff_SRA_single()
 
 stringtie_SRA_single()
 {
-    java -jar /usr/bin/picard.jar SortSam I=$sra_id.bam O="$bam_out"/$sra_id.sorted.bam SORT_ORDER=coordinate
+    sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$sra_id.sorted.bam $sra_id.bam
     rm $sra_id.bam
     stringtie -G $referenceannotation "$bam_out"/$sra_id.sorted.bam -o "$bam_out"/$sra_id.gtf -p $num_threads
     coverge_cuffoff_SRA_single  
@@ -220,7 +220,7 @@ stringtie_SRA_single()
 
 cufflinks_SRA_single()
 {
-    java -jar /usr/bin/picard.jar SortSam I=$sra_id.bam O="$bam_out"/$sra_id.sorted.bam SORT_ORDER=coordinate
+    sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$sra_id.sorted.bam $sra_id.bam
     rm $sra_id.bam
     cufflinks "$bam_out"/$sra_id.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
     mv "$bam_out"/transcripts.gtf "$bam_out"/$sra_id.gtf
