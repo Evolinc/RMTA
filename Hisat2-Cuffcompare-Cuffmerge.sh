@@ -576,13 +576,13 @@ if [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ] && [ "$quality_33" != 0 ] &
 
       elif [[ "$extension" =~ "fastq.gz" ]]; then
         filename=$(basename "$f" ".fastq.gz")
-        filename2=${filename/.r1/.r2}
+        filename2=${filename/_R1/_R2}
 	      filename3=$(echo $filename | sed 's/.r1//')
 
         if [ $numb -eq 1 ] && [ "$cuff_merge" == 0 ]; then
             hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 | samtools view -Sbo $filename3.bam -
             stringtie_non_SRA
-            rm $fbname*
+            rm $fbname* 
             rm -r temp
             exit
         elif [ $numb -eq 1 ] && [ "$cuff_merge" != 0 ]; then
