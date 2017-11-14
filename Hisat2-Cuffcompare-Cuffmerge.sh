@@ -289,7 +289,7 @@ coverge_cuffoff_SRA_multi()
 
 stringtie_SRA_multi()
 {
-    sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $filename.bam
+    sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $f.bam
     rm $f.bam
     stringtie -G $referenceannotation "$bam_out"/$f.sorted.bam -o "$bam_out"/$f.gtf -p $num_threads
     coverge_cuffoff_SRA_multi
@@ -305,7 +305,7 @@ stringtie_SRA_multi()
 
 cufflinks_SRA_multi()
 {
-    sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $filename.bam
+    sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $f.bam
     rm $f.bam
     cufflinks "$bam_out"/$f.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
     mv "$bam_out"/transcripts.gtf "$bam_out"/$f.gtf
