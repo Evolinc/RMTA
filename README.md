@@ -28,7 +28,7 @@ docker run evolinc/rmta:1.6 -h
 ```
 # Run rmta on the test data. The sample data can be found in the sample_data folder in this (https://github.com/Evolinc/RMTA/tree/master/sample_data) 
 git clone https://github.com/Evolinc/RMTA.git
-cd RMTA
+cd RMTA/sample_data
 ```
 
 ```
