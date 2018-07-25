@@ -1,3 +1,9 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/evolinc/rmta.svg)](https://hub.docker.com/r/evolinc/rmta/)
+[![Docker Stars](https://img.shields.io/docker/stars/evolinc/rmta.svg)](https://hub.docker.com/r/evolinc/rmta/)
+[![Docker Build Status](https://img.shields.io/docker/build/evolinc/rmta.svg)](https://hub.docker.com/r/evolinc/rmta/)
+[![Docker Automated build](https://img.shields.io/docker/automated/evolinc/rmta.svg)](https://hub.docker.com/r/evolinc/rmta/)
+[![Release](https://shields.beevelop.com/github/release/Evolinc/RMTA.svg?style=flat-square)](https://github.com/Evolinc/RMTA/releases)
+
 # RMTA: Read Mapping and Transcript Assembly workflow
 
 ## Introduction
