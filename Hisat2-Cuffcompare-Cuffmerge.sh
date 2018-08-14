@@ -332,42 +332,42 @@ cufflinks_SRA_multi()
 coverge_cuffoff_non_SRA()
 {
     if [ "$threshold" -eq "$param5" ]; then
-       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "4.' -e 'cov "3.' -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "4\.' -e 'cov "3\.' -e 'cov "2\.' -e 'cov "1\.' -e 'cov "0\.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf >"$bam_out"/$filename3.gtf.filtered.gtf
        var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
        if [ "$var" -eq 0 ]; then
           echo No transcripts have FPKM values exceeding your "$param5" cut-off have been found in $filename3.gtf.filtered.gtf. Try lowering your cut-off 1>&2
        fi
     elif [ "$threshold" -eq "$param4" ]; then
-       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "3.' -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "3\.' -e 'cov "2\.' -e 'cov "1\.' -e 'cov "0\.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf >"$bam_out"/$filename3.gtf.filtered.gtf
        var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
        if [ "$var" -eq 0 ]; then
           echo No transcripts have FPKM values exceeding your "$param4" cut-off have been found in $filename3.gtf.filtered.gtf. Try lowering your cut-off 1>&2
        fi
     elif [ "$threshold" -eq "$param3" ]; then
-       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "2.' -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "2\.' -e 'cov "1\.' -e 'cov "0\.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf >"$bam_out"/$filename3.gtf.filtered.gtf
        var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
        if [ "$var" -eq 0 ]; then
           echo No transcripts have FPKM values exceeding your "$param3" cut-off have been found in $filename3.gtf.filtered.gtf. Try lowering your cut-off 1>&2
        fi
     elif [ "$threshold" -eq "$param2" ]; then
-       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "1.' -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "1\.' -e 'cov "0\.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf >"$bam_out"/$filename3.gtf.filtered.gtf
        var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
        if [ "$var" -eq 0 ]; then
           echo No transcripts have FPKM values exceeding your "$param2" cut-off have been found in $filename3.gtf.filtered.gtf. Try lowering your cut-off 1>&2
        fi
     elif [ "$threshold" -eq "$param1" ]; then
-       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "0.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "0\.' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf >"$bam_out"/$filename3.gtf.filtered.gtf
        var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
        if [ "$var" -eq 0 ]; then
           echo No transcripts have FPKM values exceeding your "$param1" cut-off have been found in $filename3.gtf.filtered.gtf. Try lowering your cut-off 1>&2
        fi
     elif [ "$threshold" -eq "$param0" ]; then
-       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "0.000' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
+       grep " transcript" "$bam_out"/$filename3.gtf | grep -e 'cov "0\.000' | cut -f 9 | cut -d " " -f 4 | sort -u > listtoremove.txt
        grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf >"$bam_out"/$filename3.gtf.filtered.gtf
     else
         echo "Invalid coverage parameter. Please select a whole number between 0-5"
