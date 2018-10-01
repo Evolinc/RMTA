@@ -32,9 +32,9 @@ RUN make default install -C sra-tools
 
 # Hisat2
 WORKDIR /hisat2
-RUN wget ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/downloads/hisat2-2.0.5-Linux_x86_64.zip 
-RUN unzip hisat2-2.0.5-Linux_x86_64.zip
-RUN cp hisat2-2.0.5/hisat* $BINPATH
+RUN wget ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/downloads/hisat2-2.1.0-Linux_x86_64.zip
+RUN unzip hisat2-2.1.0-Linux_x86_64.zip
+RUN cp hisat2-2.1.0/hisat* $BINPATH
 
 # Cufflinks
 WORKDIR /
