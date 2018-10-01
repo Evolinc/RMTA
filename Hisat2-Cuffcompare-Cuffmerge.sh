@@ -394,7 +394,7 @@ stringtie_non_SRA()
 cufflinks_non_SRA()
 {
     sambamba_v0.6.6 sort --tmpdir=temp -t $num_threads -o "$bam_out"/$filename3.sorted.bam $filename3.bam
-    $filename3.bam
+    rm $filename3.bam
     cufflinks "$bam_out"/$filename3.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
     mv "$bam_out"/skipped.gtf "$bam_out"/$filename3.skipped.gtf
     mv "$bam_out"/transcripts.gtf "$bam_out"/$filename3.gtf
