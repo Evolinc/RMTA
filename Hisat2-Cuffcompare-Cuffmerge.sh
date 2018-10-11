@@ -1179,7 +1179,7 @@ elif [ ! -z "$single_reads" ] && [ "$quality_33" != 0 ] && [ "$tra_as" == 0 ] &&
       cuff_merge_fun
     fi
 
-# Phred 33
+# Phred 64
 
 elif [ ! -z "$single_reads" ] && [ "$quality_64" != 0 ] && [ "$tra_as" == 0 ] && [ "$tra_cuff" != 0 ]; then
     mkdir "$bam_out"
