@@ -32,28 +32,29 @@ RUN make default install -C sra-tools
 
 # Hisat2
 WORKDIR /hisat2
-RUN wget ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/downloads/hisat2-2.0.5-Linux_x86_64.zip 
-RUN unzip hisat2-2.0.5-Linux_x86_64.zip
-RUN cp hisat2-2.0.5/hisat* $BINPATH
+RUN wget ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/downloads/hisat2-2.1.0-Linux_x86_64.zip 
+RUN unzip hisat2-2.1.0-Linux_x86_64.zip
 
 # Cufflinks
 WORKDIR /
 RUN wget -O- http://cole-trapnell-lab.github.io/cufflinks/assets/downloads/cufflinks-2.2.1.Linux_x86_64.tar.gz | tar xzvf -
 
 # Stringtie
-RUN wget -O- http://ccb.jhu.edu/software/stringtie/dl/stringtie-1.2.4.Linux_x86_64.tar.gz | tar xzvf -
+RUN wget -O- http://ccb.jhu.edu/software/stringtie/dl/stringtie-1.3.4d.Linux_x86_64.tar.gz | tar xzvf -
 
 # Samtools
-RUN wget https://github.com/samtools/samtools/releases/download/1.3.1/samtools-1.3.1.tar.bz2 
-RUN tar xvf samtools-1.3.1.tar.bz2
-WORKDIR /samtools-1.3.1
+RUN apt-get install -y libbz2-dev liblzma-dev
+RUN wget https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2
+RUN tar xvf samtools-1.9.tar.bz2
+WORKDIR /samtools-1.9
 RUN make
 
-# Picard
+# Sambamba
 WORKDIR /
-RUN wget https://github.com/lomereiter/sambamba/releases/download/v0.6.6/sambamba_v0.6.6_linux.tar.bz2
-RUN tar xvf sambamba_v0.6.6_linux.tar.bz2
-RUN mv sambamba_v0.6.6 /usr/bin
+RUN wget https://github.com/biod/sambamba/releases/download/v0.6.8/sambamba-0.6.8-linux-static.gz
+RUN gzip -d sambamba-0.6.8-linux-static.gz
+RUN chmod +x sambamba-0.6.8-linux-static
+RUN mv sambamba-0.6.8-linux-static /usr/bin
 
 # Wrapper script
 ADD Hisat2-Cuffcompare-Cuffmerge.sh $BINPATH
@@ -61,7 +62,8 @@ RUN chmod +x $BINPATH/Hisat2-Cuffcompare-Cuffmerge.sh
 
 # Set environment
 ENV PATH /cufflinks-2.2.1.Linux_x86_64/:$PATH
-ENV PATH /stringtie-1.2.4.Linux_x86_64/:$PATH
-ENV PATH /samtools-1.3.1/:$PATH
+ENV PATH /stringtie-1.3.4d.Linux_x86_64/:$PATH
+ENV PATH /samtools-1.9/:$PATH
+ENV PATH /hisat2/hisat2-2.1.0/:$PATH
 
 ENTRYPOINT ["Hisat2-Cuffcompare-Cuffmerge.sh"]
