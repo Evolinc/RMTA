@@ -740,8 +740,8 @@ stringtie_SRA_multi()
     echo "###################"
     echo "Running Stringtie"
     echo "####################"
-    echo "sambamba-0.6.8-linux-static sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $filename.bam"
-    sambamba-0.6.8-linux-static sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $filename.bam
+    echo "sambamba-0.6.8-linux-static sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $f.bam"
+    sambamba-0.6.8-linux-static sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $f.bam
     rm -r temp $f.bam
     echo "stringtie -G $referenceannotation "$bam_out"/$f.sorted.bam -o "$bam_out"/$f.gtf -p $num_threads"
     stringtie -G $referenceannotation "$bam_out"/$f.sorted.bam -o "$bam_out"/$f.gtf -p $num_threads
@@ -768,8 +768,8 @@ cufflinks_SRA_multi()
     echo "###################"
     echo "Running Cufflinks"
     echo "####################"
-    echo "sambamba-0.6.8-linux-static sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $filename.bam"
-    sambamba-0.6.8-linux-static sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $filename.bam
+    echo "sambamba-0.6.8-linux-static sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $f.bam"
+    sambamba-0.6.8-linux-static sort --tmpdir=temp -t $num_threads -o "$bam_out"/$f.sorted.bam $f.bam
     rm -r temp $f.bam
     echo "cufflinks "$bam_out"/$f.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out""
     cufflinks "$bam_out"/$f.sorted.bam -p $num_threads -g $referenceannotation -o "$bam_out"
@@ -2494,9 +2494,8 @@ elif [ ! -z $sra_id ] && [ "$quality_33" != 0 ] && [ "$tra_as" != 0 ] && [ "$tra
       echo "samtools view -Sbo $f.bam $f.sam"
       samtools view -Sbo $f.bam $f.sam
       rm $f.sam
-      mv mapped.txt metrics.txt "$bam_out"
       stringtie_SRA_multi      
-      done < "$sra_id" 
+      done < "$sra_id"
       if [ "$cuff_merge" == 0 ]; then
         mkdir index && mv $fbname* index
         mv mapped.txt metrics.txt "$bam_out"
@@ -2520,8 +2519,12 @@ elif [ ! -z $sra_id ] && [ "$quality_33" != 0 ] && [ "$tra_as" != 0 ] && [ "$tra
     echo "samtools view -Sbo $sra_id.bam $sra_id.sam"
     samtools view -Sbo $sra_id.bam $sra_id.sam
     rm $sra_id.sam
+    mkdir index && mv $fbname* index
     mv mapped.txt metrics.txt "$bam_out"
     stringtie_SRA_single
+    echo "##############################"
+    echo "Pipeline executed successfully"
+    echo "##############################"
     if [ "$cuff_merge" != 0 ]; then
       echo "cuffmerge only works with more than one SRA accesions. Use File containing SRA id's option to use cuffmerge"
     fi  
@@ -2570,8 +2573,12 @@ elif [ ! -z $sra_id ] && [ "$quality_64" != 0 ] && [ "$tra_as" != 0 ] && [ "$tra
     echo "samtools view -Sbo $sra_id.bam $sra_id.sam"
     samtools view -Sbo $sra_id.bam $sra_id.sam
     rm $sra_id.sam
+    mkdir index && mv $fbname* index
     mv mapped.txt metrics.txt "$bam_out"
     stringtie_SRA_single
+    echo "##############################"
+    echo "Pipeline executed successfully"
+    echo "##############################"
     if [ "$cuff_merge" != 0 ]; then
       echo "cuffmerge only works with more than one SRA accesions. Use File containing SRA id's option to use cuffmerge"
     fi
@@ -2622,8 +2629,12 @@ elif [ ! -z $sra_id ] && [ "$quality_33" != 0 ] && [ "$tra_as" == 0 ] && [ "$tra
     echo "samtools view -Sbo $sra_id.bam $sra_id.sam"
     samtools view -Sbo $sra_id.bam $sra_id.sam
     rm $sra_id.sam
+    mkdir index && mv $fbname* index
     mv mapped.txt metrics.txt "$bam_out"
     cufflinks_SRA_single
+    echo "##############################"
+    echo "Pipeline executed successfully"
+    echo "##############################"
     if [ "$cuff_merge" != 0 ]; then
       echo "cuffmerge only works with more than one SRA accesions. Use File containing SRA id's option to use cuffmerge"
     fi
@@ -2672,8 +2683,12 @@ elif [ ! -z $sra_id ] && [ "$quality_64" != 0 ] && [ "$tra_as" == 0 ] && [ "$tra
     echo "samtools view -Sbo $sra_id.bam $sra_id.sam"
     samtools view -Sbo $sra_id.bam $sra_id.sam
     rm $sra_id.sam
+    mkdir index && mv $fbname* index
     mv mapped.txt metrics.txt "$bam_out"
     cufflinks_SRA_single
+    echo "##############################"
+    echo "Pipeline executed successfully"
+    echo "##############################"
     if [ "$cuff_merge" != 0 ]; then
       echo "Cuffmerge only works with more than one SRA accesions. Use File containing SRA id's option to use cuffmerge!!!!"
     fi
