@@ -683,6 +683,8 @@ duplicates_paired()
       rmdup=$(basename $filename3.sorted.bam ".sorted.bam")
       picard MarkDuplicates I=$filename3.sorted.bam O=$rmdup."sorted.rmdup.bam" ASSUME_SORTED=TRUE METRICS_FILE=/dev/null VALIDATION_STRINGENCY=SILENT REMOVE_DUPLICATES=true
       mv $filename3.sorted.bam $filename3.sorted.bam.bai $rmdup."sorted.rmdup.bam" "$bam_out"
+    else
+      mv $filename3.sorted.bam $filename3.sorted.bam.bai "$bam_out"
     fi
 }
 
