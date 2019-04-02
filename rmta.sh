@@ -681,8 +681,8 @@ duplicates_paired()
     rm -r temp $filename3.bam
     if [ "$duplicates" != 0 ]; then
       rmdup=$(basename $filename3.sorted.bam ".sorted.bam")
-      picard MarkDuplicates I=$filename3.sorted.bam O=$rmdup."sorted.rmdup.bam" ASSUME_SORTED=TRUE METRICS_FILE=/dev/null VALIDATION_STRINGENCY=SILENT REMOVE_DUPLICATES=true
-      mv $filename3.sorted.bam $filename3.sorted.bam.bai $rmdup."sorted.rmdup.bam" "$bam_out"
+      picard MarkDuplicates I=$filename3.sorted.bam O=$rmdup."sorted.rmdup.bam" ASSUME_SORTED=TRUE METRICS_FILE=/dev/null VALIDATION_STRINGENCY=SILENT REMOVE_DUPLICATES=true M=marked_dup_metrics.txt
+      mv $filename3.sorted.bam $filename3.sorted.bam.bai $rmdup."sorted.rmdup.bam" marked_dup_metrics.txt "$bam_out"
     else
       mv $filename3.sorted.bam $filename3.sorted.bam.bai "$bam_out"
     fi
@@ -1005,7 +1005,7 @@ elif [ ! -z $sra_id ]; then
       if [ "$duplicates" != 0 ]; then
         rmdup=$(basename $f.sorted.bam ".sorted.bam")
         picard MarkDuplicates I=$f.sorted.bam O=$rmdup."sorted.rmdup.bam" ASSUME_SORTED=TRUE METRICS_FILE=/dev/null VALIDATION_STRINGENCY=SILENT REMOVE_DUPLICATES=true
-        mv $f.sorted.bam $f.sorted.bam.bai $rmdup."sorted.rmdup.bam" "$bam_out"
+        mv $rmdup."sorted.rmdup.bam" "$bam_out"
       fi
       stringtie_SRA_multi
       if [ "$fastqc" != 0 ]; then
@@ -1058,7 +1058,7 @@ elif [ ! -z $sra_id ]; then
     if [ "$duplicates" != 0 ]; then
       rmdup=$(basename $sra_id.sorted.bam ".sorted.bam")
       picard MarkDuplicates I=$sra_id.sorted.bam O=$rmdup."sorted.rmdup.bam" ASSUME_SORTED=TRUE METRICS_FILE=/dev/null VALIDATION_STRINGENCY=SILENT REMOVE_DUPLICATES=true
-      mv $sra_id.sorted.bam $sra_id.sorted.bam.bai $rmdup."sorted.rmdup.bam" "$bam_out"
+      mv $rmdup."sorted.rmdup.bam" "$bam_out"
     fi
     stringtie_SRA_single
     if [ "$fastqc" != 0 ]; then
