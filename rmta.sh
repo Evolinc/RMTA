@@ -54,6 +54,8 @@ cat <<'EOF'
 
   -b Bowtie2 mapping
 
+  -t Type of reads (Single end or Paired end)
+
 EOF
     exit 0
 }
@@ -64,7 +66,7 @@ hisat=0
 bowtie=0
 duplicates=0
 
-while getopts ":hg:i:A:l:1:2:U:O:s:p:5:3:f:Qedtbm:M:k:" opt; do
+while getopts ":hg:i:A:l:1:2:U:O:s:p:5:3:f:Qedtbm:M:k:y:" opt; do
   case $opt in
     g)
     referencegenome=$OPTARG # Reference genome file
@@ -128,6 +130,9 @@ while getopts ":hg:i:A:l:1:2:U:O:s:p:5:3:f:Qedtbm:M:k:" opt; do
      ;;
     b)
     bowtie=$OPTARG # Bowtie2
+     ;;
+    y)
+    seq_type=$OPTARG # Type of Sequence data
      ;;
     h)
     usage
@@ -664,9 +669,9 @@ success_message()
 
 featurecounts()
 {
-    if [ "$lib_type" == "F" ] || [ "$lib_type" == "R" ]; then
+    if [ "$seq_type" == "SE" ]; then
       featureCounts -T $num_threads -t exon -g gene_id -a $referenceannotation -o feature_counts.txt "$bam_out"/*.sorted.bam
-    elif [ "$lib_type" == "FR" ] || [ "$lib_type" == "RF" ]; then
+    elif [ "$seq_type" == "PE" ]; then
       featureCounts -p -T $num_threads -t exon -g gene_id -a $referenceannotation -o feature_counts.txt "$bam_out"/*.sorted.bam
     fi
     awk '{$2=$3=$4=$5=$6=""; print $0}' OFS='\t' feature_counts.txt | grep -v "#" | sed 's/\t\+/\t/g;s/^\t//' > temp.txt && mv temp.txt feature_counts.txt
@@ -681,8 +686,8 @@ duplicates_paired()
     rm -r temp $filename3.bam
     if [ "$duplicates" != 0 ]; then
       rmdup=$(basename $filename3.sorted.bam ".sorted.bam")
-      picard MarkDuplicates I=$filename3.sorted.bam O=$rmdup."sorted.rmdup.bam" ASSUME_SORTED=TRUE METRICS_FILE=/dev/null VALIDATION_STRINGENCY=SILENT REMOVE_DUPLICATES=true M=marked_dup_metrics.txt
-      mv $filename3.sorted.bam $filename3.sorted.bam.bai $rmdup."sorted.rmdup.bam" marked_dup_metrics.txt "$bam_out"
+      picard MarkDuplicates I=$filename3.sorted.bam O=$rmdup."sorted.rmdup.bam" ASSUME_SORTED=TRUE METRICS_FILE=/dev/null VALIDATION_STRINGENCY=SILENT REMOVE_DUPLICATES=true
+      mv $rmdup."sorted.rmdup.bam" "$bam_out"
     else
       mv $filename3.sorted.bam $filename3.sorted.bam.bai "$bam_out"
     fi
@@ -723,21 +728,37 @@ paired_fq_gz()
     filename=$(basename "$f" ".fq.gz")
     filename2=${filename/_R1/_R2}
     filename3=$(echo $filename | sed 's/_R1//')
+    if [ "$fastqc" != 0 ]; then
+      fastqc ${filename}.fq.gz ${filename2}.fq.gz
+      mkdir "$filename3".fastqc_out
+      mv *.zip *.html "$filename3".fastqc_out
+      mv "$filename3".fastqc_out "$bam_out"
+    fi
     echo "------------------------------------------" >> mapped.txt
     echo "### Mapping percentages of" $filename3 "###" >> mapped.txt
     echo "------------------------------------------" >> mapped.txt
     echo "#######################"
-    echo "Running Hisat2 mapping"
+    echo "Running Mapping step"
     echo "#######################"
     if [ "$quality_64" != 0 ] && [ "$hisat" != 0 ]; then
+      if [ "$lib_type" == "US" ]; then
+        echo "hisat2 -x $fbname -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
+        hisat2 -x $fbname -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      else
         echo "hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      fi
     elif [ "$quality_64" != 0 ] &&[ "$bowtie" != 0 ]; then
         echo "bowtie2 -x ref_genome -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         bowtie2 -x ref_genome -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
     elif [ "$quality_64" == 0 ] && [ "$hisat" != 0 ]; then # phred 33 default
+      if [ "$lib_type" == "US" ]; then
+        echo "hisat2 -x $fbname -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
+        hisat2 -x $fbname -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      else
         echo "hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      fi
     elif [ "$quality_64" == 0 ] &&[ "$bowtie" != 0 ]; then
         echo "bowtie2 -x ref_genome -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         bowtie2 -x ref_genome -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
@@ -757,21 +778,37 @@ paired_fq()
     filename=$(basename "$f" ".fq")
     filename2=${filename/_R1/_R2}
     filename3=$(echo $filename | sed 's/_R1//')
+    if [ "$fastqc" != 0 ]; then
+      fastqc ${filename}.fq ${filename2}.fq
+      mkdir "$filename3".fastqc_out
+      mv *.zip *.html "$filename3".fastqc_out
+      mv "$filename3".fastqc_out "$bam_out"
+    fi
     echo "------------------------------------------" >> mapped.txt
     echo "### Mapping percentages of" $filename3 "###" >> mapped.txt
     echo "------------------------------------------" >> mapped.txt
     echo "#######################"
-    echo "Running Hisat2 mapping"
+    echo "Running Mapping step"
     echo "#######################"
     if [ "$quality_64" != 0 ] && [ "$hisat" != 0 ]; then
+      if [ "$lib_type" == "US" ]; then
+        echo "hisat2 -x $fbname -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
+        hisat2 -x $fbname -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      else
         echo "hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      fi
     elif [ "$quality_64" != 0 ] &&[ "$bowtie" != 0 ]; then
         echo "bowtie2 -x ref_genome -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         bowtie2 -x ref_genome -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
     elif [ "$quality_64" == 0 ] && [ "$hisat" != 0 ]; then # phred 33 default
+      if [ "$lib_type" == "US" ]; then
+        echo "hisat2 -x $fbname -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
+        hisat2 -x $fbname -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      else
         echo "hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      fi
     elif [ "$quality_64" == 0 ] &&[ "$bowtie" != 0 ]; then
         echo "bowtie2 -x ref_genome -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         bowtie2 -x ref_genome -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
@@ -791,21 +828,37 @@ paired_fastq_gz()
     filename=$(basename "$f" ".fastq.gz")
     filename2=${filename/_R1/_R2}
     filename3=$(echo $filename | sed 's/_R1//')
+    if [ "$fastqc" != 0 ]; then
+      fastqc ${filename}.fastq.gz ${filename2}.fastq.gz
+      mkdir "$filename3".fastqc_out
+      mv *.zip *.html "$filename3".fastqc_out
+      mv "$filename3".fastqc_out "$bam_out"
+    fi
     echo "------------------------------------------" >> mapped.txt
     echo "### Mapping percentages of" $filename3 "###" >> mapped.txt
     echo "------------------------------------------" >> mapped.txt
     echo "#######################"
-    echo "Running Hisat2 mapping"
+    echo "Running Mapping step"
     echo "#######################"
     if [ "$quality_64" != 0 ] && [ "$hisat" != 0 ]; then
+      if [ "$lib_type" == "US" ]; then
+        echo "hisat2 -x $fbname -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
+        hisat2 -x $fbname -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      else
         echo "hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      fi
     elif [ "$quality_64" != 0 ] &&[ "$bowtie" != 0 ]; then
         echo "bowtie2 -x ref_genome -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         bowtie2 -x ref_genome -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
     elif [ "$quality_64" == 0 ] && [ "$hisat" != 0 ]; then # phred 33 default
+      if [ "$lib_type" == "US" ]; then
+        echo "hisat2 -x $fbname -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
+        hisat2 -x $fbname -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      else
         echo "hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      fi
     elif [ "$quality_64" == 0 ] &&[ "$bowtie" != 0 ]; then
         echo "bowtie2 -x ref_genome -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         bowtie2 -x ref_genome -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
@@ -825,21 +878,37 @@ paired_fastq()
     filename=$(basename "$f" ".fastq")
     filename2=${filename/_R1/_R2}
     filename3=$(echo $filename | sed 's/_R1//')
+    if [ "$fastqc" != 0 ]; then
+      fastqc ${filename}.fastq ${filename2}.fastq
+      mkdir "$filename3".fastqc_out
+      mv *.zip *.html "$filename3".fastqc_out
+      mv "$filename3".fastqc_out "$bam_out"
+    fi
     echo "------------------------------------------" >> mapped.txt
     echo "### Mapping percentages of" $filename3 "###" >> mapped.txt
     echo "------------------------------------------" >> mapped.txt
     echo "#######################"
-    echo "Running Hisat2 mapping"
+    echo "Running Mapping step"
     echo "#######################"
     if [ "$quality_64" != 0 ] && [ "$hisat" != 0 ]; then
+      if [ "$lib_type" == "US" ]; then
+        echo "hisat2 -x $fbname -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
+        hisat2 -x $fbname -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      else
         echo "hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      fi
     elif [ "$quality_64" != 0 ] &&[ "$bowtie" != 0 ]; then
         echo "bowtie2 -x ref_genome -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         bowtie2 -x ref_genome -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
     elif [ "$quality_64" == 0 ] && [ "$hisat" != 0 ]; then # phred 33 default
+      if [ "$lib_type" == "US" ]; then
+        echo "hisat2 -x $fbname -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
+        hisat2 -x $fbname -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      else
         echo "hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         hisat2 -x $fbname --rna-strandness $lib_type -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
+      fi
     elif [ "$quality_64" == 0 ] &&[ "$bowtie" != 0 ]; then
         echo "bowtie2 -x ref_genome -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
         bowtie2 -x ref_genome -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
@@ -862,17 +931,27 @@ single_end()
     echo "### Mapping percentages of" $filename "###" >> mapped.txt
     echo "------------------------------------------" >> mapped.txt
     echo "#######################"
-    echo "Running Hisat2 mapping"
+    echo "Running Mapping step"
     echo "#######################"
     if [ "$quality_64" != 0 ] && [ "$hisat" != 0 ]; then
+      if [ "$lib_type" == "US" ]; then
+        echo "hisat2 -x $fbname -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename.sam --met-file metrics.txt 2>> mapped.txt"
+        hisat2 -x $fbname -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename.sam --met-file metrics.txt 2>> mapped.txt
+      else
         echo "hisat2 -x $fbname --rna-strandness $lib_type -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename.sam --met-file metrics.txt 2>> mapped.txt"
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $filename.sam --met-file metrics.txt 2>> mapped.txt
+      fi
     elif [ "$quality_64" != 0 ] &&[ "$bowtie" != 0 ]; then
         echo "bowtie2 -x ref_genome -U $f -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $filename.sam --met-file metrics.txt 2>> mapped.txt"
         bowtie2 -x ref_genome -U $f -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $filename.sam --met-file metrics.txt 2>> mapped.txt
     elif [ "$quality_64" == 0 ] && [ "$hisat" != 0 ]; then # phred 33 default
+      if [ "$lib_type" == "US" ]; then
+        echo "hisat2 -x $fbname -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename.sam --met-file metrics.txt 2>> mapped.txt"
+        hisat2 -x $fbname -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename.sam --met-file metrics.txt 2>> mapped.txt
+      else
         echo "hisat2 -x $fbname --rna-strandness $lib_type -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename.sam --met-file metrics.txt 2>> mapped.txt"
         hisat2 -x $fbname --rna-strandness $lib_type -U $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $filename.sam --met-file metrics.txt 2>> mapped.txt
+      fi
     elif [ "$quality_64" == 0 ] &&[ "$bowtie" != 0 ]; then
         echo "bowtie2 -x ref_genome -U $f -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename.sam --met-file metrics.txt 2>> mapped.txt"
         bowtie2 -x ref_genome -U $f -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename.sam --met-file metrics.txt 2>> mapped.txt
@@ -885,7 +964,7 @@ single_end()
     if [ "$duplicates" != 0 ]; then
       rmdup=$(basename $filename.sorted.bam ".sorted.bam")
       picard MarkDuplicates I=$filename.sorted.bam O=$rmdup."sorted.rmdup.bam" ASSUME_SORTED=TRUE METRICS_FILE=/dev/null VALIDATION_STRINGENCY=SILENT REMOVE_DUPLICATES=true
-      mv $filename.sorted.bam $filename.sorted.bam.bai $rmdup".sorted.rmdup.bam" "$bam_out"
+      mv $rmdup".sorted.rmdup.bam" "$bam_out"
     fi
     stringtie_non_SRA_single
     if [ "$hisat" != 0 ]; then
@@ -964,7 +1043,15 @@ elif [ ! -z "$single_reads" ]; then
     mkdir "$bam_out"
     numb=$(ls "${single_reads[@]}" | wc -l)
     for f in "${single_reads[@]}"; do
-      single_end
+      if [ "$fastqc" != 0 ]; then
+        fastqc $f
+        mkdir "$f".fastqc_out
+        mv *.zip *.html "$f".fastqc_out
+        mv "$f".fastqc_out "$bam_out"
+        single_end
+      else
+        single_end
+      fi
     done
     success_message
 
@@ -983,17 +1070,27 @@ elif [ ! -z $sra_id ]; then
       echo "### Mapping percentages of" $f "###" >> mapped.txt
       echo "------------------------------------------" >> mapped.txt
       echo "#######################"
-      echo "Running Hisat2 mapping"
+      echo "Running Mapping step"
       echo "#######################"
       if [ "$quality_64" != 0 ] && [ "$hisat" != 0 ]; then #(-Q -h)
+        if [ "$lib_type" == "US" ]; then 
           echo "hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $f.sam --met-file metrics.txt 2>> mapped.txt"
           hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $f.sam --met-file metrics.txt 2>> mapped.txt
+        else
+          echo "hisat2 -x $fbname --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $f.sam --met-file metrics.txt 2>> mapped.txt"
+          hisat2 -x $fbname --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $f.sam --met-file metrics.txt 2>> mapped.txt
+        fi
       elif [ "$quality_64" != 0 ] &&[ "$bowtie" != 0 ]; then #(-Q -b)
           echo "bowtie2 -x ref_genome --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $f.sam --met-file metrics.txt 2>> mapped.txt"
-          bowtie2 -x ref_genome --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $f.sam --met-file metrics.txt 2>> mapped.txt
+          bowtie2 -x ref_genome --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $f.sam --met-file metrics.txt 2>> mapped.txt 
       elif [ "$quality_64" == 0 ] && [ "$hisat" != 0 ]; then # phred 33 default #(-h)
+        if [ "$lib_type" == "US" ]; then
+          echo "hisat2 -x $fbname --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $f.sam --met-file metrics.txt 2>> mapped.txt"
+          hisat2 -x $fbname --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $f.sam --met-file metrics.txt 2>> mapped.txt
+        else
           echo "hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $f.sam --met-file metrics.txt 2>> mapped.txt"
           hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $f.sam --met-file metrics.txt 2>> mapped.txt
+        fi
       elif [ "$quality_64" == 0 ] &&[ "$bowtie" != 0 ]; then #(-b)
           echo "bowtie2 -x ref_genome --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $f.sam --met-file metrics.txt 2>> mapped.txt"
           bowtie2 -x ref_genome --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $f.sam --met-file metrics.txt 2>> mapped.txt
@@ -1009,12 +1106,12 @@ elif [ ! -z $sra_id ]; then
       fi
       stringtie_SRA_multi
       if [ "$fastqc" != 0 ]; then
-        if [ "$lib_type" == "F" ] || [ "$lib_type" == "R" ]; then
+        if [ "$seq_type" == "SE" ]; then
           picard SamToFastq I="$f".bam FASTQ="$f".fastq
           fastqc "$f".fastq
           mkdir "$f".fastqc_out
           mv "$f".fastq *.zip *.html "$f".fastqc_out
-        elif [ "$lib_type" == "FR" ] || [ "$lib_type" == "RF" ]; then
+        elif [ "$seq_type" == "PE" ]; then
           picard SamToFastq I="$f".bam FASTQ="$f"."R1".fastq SECOND_END_FASTQ="$f"."R2".fastq
           fastqc "$f"."R1".fastq "$f"."R2".fastq
           mkdir "$f".fastqc_out
@@ -1036,17 +1133,27 @@ elif [ ! -z $sra_id ]; then
     echo "### Mapping percentages of" $sra_id "###" >> mapped.txt
     echo "------------------------------------------" >> mapped.txt
     echo "#######################"
-    echo "Running Hisat2 mapping"
+    echo "Running Mapping step"
     echo "#######################"
     if [ "$quality_64" != 0 ] && [ "$hisat" != 0 ]; then
-        echo "hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt"
-        hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt
+        if [ "$lib_type" == "US" ]; then 
+          echo "hisat2 -x $fbname --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt"
+          hisat2 -x $fbname --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt
+        else
+          echo "hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt"
+          hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred64 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt
+        fi
     elif [ "$quality_64" != 0 ] &&[ "$bowtie" != 0 ]; then
         echo "bowtie2 -x ref_genome --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt"
         bowtie2 -x ref_genome --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --phred64 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt
     elif [ "$quality_64" == 0 ] && [ "$hisat" != 0 ]; then # phred 33 default
-        echo "hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt"
-        hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt
+        if [ "$lib_type" == "US" ]; then 
+          echo "hisat2 -x $fbname --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt"
+          hisat2 -x $fbname --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt
+        else
+          echo "hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt"
+          hisat2 -x $fbname --rna-strandness $lib_type --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --min-intronlen $min_intl --max-intronlen $max_intl --dta --phred33 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt
+        fi
     elif [ "$quality_64" == 0 ] &&[ "$bowtie" != 0 ]; then
         echo "bowtie2 -x ref_genome --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt"
         bowtie2 -x ref_genome --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt
@@ -1062,13 +1169,13 @@ elif [ ! -z $sra_id ]; then
     fi
     stringtie_SRA_single
     if [ "$fastqc" != 0 ]; then
-      if [ "$lib_type" == "F" ] || [ "$lib_type" == "R" ]; then
+      if [ "$seq_type" == "SE" ]; then
         picard SamToFastq I=$sra_id.bam FASTQ="$sra_id".fastq
         fastqc "$sra_id".fastq
         mkdir fastqc_out
         mv "$sra_id".fastq *.zip *.html fastqc_out
         mv fastqc_out "$bam_out/Fasqc_out"
-      elif [ "$lib_type" == "FR" ] || [ "$lib_type" == "RF" ]; then
+      elif [ "$seq_type" == "PE" ]; then
         picard SamToFastq I=$sra_id.bam FASTQ="$sra_id"."R1".fastq SECOND_END_FASTQ="$sra_id"."R2".fastq
         echo "fastqc "$sra_id"."R1".fastq "$sra_id"."R2".fastq"
         fastqc "$sra_id"."R1".fastq "$sra_id"."R2".fastq
