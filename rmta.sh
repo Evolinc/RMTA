@@ -271,9 +271,8 @@ stringtie_non_SRA()
       echo "###################"
       echo "Running Stringtie"
       echo "####################"
-      echo "stringtie -G $referenceannotation $filename3.sorted.bam -o $filename3.gtf -p $num_threads"
-      stringtie -G $referenceannotation $filename3.sorted.bam -o $filename3.gtf -p $num_threads
-      mv $filename3.sorted.bam $filename3.sorted.bam.bai $filename3.gtf "$bam_out"
+      echo "stringtie -G $referenceannotation "$bam_out"/$filename3.sorted.bam -o "$bam_out"/$filename3.gtf -p $num_threads"
+      stringtie -G $referenceannotation "$bam_out"/$filename3.sorted.bam -o "$bam_out"/$filename3.gtf -p $num_threads
       coverge_cuffoff_non_SRA
       fpkm_cuffoff_non_SRA 
       var=$(grep -vFf listtoremove.txt "$bam_out"/$filename3.gtf.filtered.gtf | wc -l)
@@ -398,8 +397,7 @@ stringtie_non_SRA_single()
       echo "Running Stringtie"
       echo "####################"
       echo "stringtie -G $referenceannotation $filename.sorted.bam -o $filename.gtf -p $num_threads"
-      stringtie -G $referenceannotation $filename.sorted.bam -o $filename.gtf -p $num_threads
-      mv $filename.sorted.bam $filename.sorted.bam.bai $filename.gtf "$bam_out"
+      stringtie -G $referenceannotation "$bam_out"/$filename.sorted.bam -o "$bam_out"/$filename.gtf -p $num_threads
       coverge_cuffoff_non_SRA_single
       fpkm_cuffoff_non_SRA_single
       var=$(grep -vFf listtoremove.txt "$bam_out"/$filename.gtf.filtered.gtf | wc -l)
@@ -687,7 +685,7 @@ duplicates_paired()
     if [ "$duplicates" != 0 ]; then
       rmdup=$(basename $filename3.sorted.bam ".sorted.bam")
       picard MarkDuplicates I=$filename3.sorted.bam O=$rmdup."sorted.rmdup.bam" ASSUME_SORTED=TRUE METRICS_FILE=/dev/null VALIDATION_STRINGENCY=SILENT REMOVE_DUPLICATES=true
-      mv $rmdup."sorted.rmdup.bam" "$bam_out"
+      mv $filename3.sorted.bam $filename3.sorted.bam.bai $rmdup."sorted.rmdup.bam" "$bam_out"
     else
       mv $filename3.sorted.bam $filename3.sorted.bam.bai "$bam_out"
     fi
@@ -964,7 +962,9 @@ single_end()
     if [ "$duplicates" != 0 ]; then
       rmdup=$(basename $filename.sorted.bam ".sorted.bam")
       picard MarkDuplicates I=$filename.sorted.bam O=$rmdup."sorted.rmdup.bam" ASSUME_SORTED=TRUE METRICS_FILE=/dev/null VALIDATION_STRINGENCY=SILENT REMOVE_DUPLICATES=true
-      mv $rmdup".sorted.rmdup.bam" "$bam_out"
+      mv $filename.sorted.bam $filename.sorted.bam.bai $rmdup".sorted.rmdup.bam" "$bam_out"
+    else
+      mv $filename.sorted.bam $filename.sorted.bam.bai "$bam_out"
     fi
     stringtie_non_SRA_single
     if [ "$hisat" != 0 ]; then
