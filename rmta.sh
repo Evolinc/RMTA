@@ -56,6 +56,12 @@ cat <<'EOF'
 
   -t Type of reads (Single end or Paired end)
 
+  -u Feature type (Default is exon)
+
+  -a Gene attribute (Default is gene_id)
+
+  -n Strandedness (Default is 0 (unstranded), 1 (stranded), 2 (reversely stranded))
+
 EOF
     exit 0
 }
@@ -66,7 +72,7 @@ hisat=0
 bowtie=0
 duplicates=0
 
-while getopts ":hg:i:A:l:1:2:U:O:s:p:5:3:f:Qedtbm:M:k:y:" opt; do
+while getopts ":hg:i:A:l:1:2:U:O:s:p:5:3:f:Qedtbm:M:k:y:u:a:n:" opt; do
   case $opt in
     g)
     referencegenome=$OPTARG # Reference genome file
@@ -133,6 +139,15 @@ while getopts ":hg:i:A:l:1:2:U:O:s:p:5:3:f:Qedtbm:M:k:y:" opt; do
      ;;
     y)
     seq_type=$OPTARG # Type of Sequence data
+     ;;
+    u) 
+    feature_type=$OPTARG # Feature type (Default is exon)
+     ;;
+    a) 
+    gene_attribute=$OPTARG # (Default is gene_id)
+     ;;
+    n)
+    strandedness=$OPTARG # (Default is 0 (unstranded), 1 (stranded), 2 (reversely stranded))
      ;;
     h)
     usage
@@ -668,9 +683,11 @@ success_message()
 featurecounts()
 {
     if [ "$seq_type" == "SE" ]; then
-      featureCounts -T $num_threads -t exon -g gene_id -a $referenceannotation -o feature_counts.txt "$bam_out"/*.sorted.bam
+      echo "featureCounts -T $num_threads -t $feature_type -g $gene_attribute -s $strandedness -a $referenceannotation -o feature_counts.txt "$bam_out"/*.sorted.bam"
+      featureCounts -T $num_threads -t $feature_type -g $gene_attribute -s $strandedness -a $referenceannotation -o feature_counts.txt "$bam_out"/*.sorted.bam
     elif [ "$seq_type" == "PE" ]; then
-      featureCounts -p -T $num_threads -t exon -g gene_id -a $referenceannotation -o feature_counts.txt "$bam_out"/*.sorted.bam
+      echo "featureCounts -p -T $num_threads -t $feature_type -g $gene_attribute -s $strandedness -a $referenceannotation -o feature_counts.txt "$bam_out"/*.sorted.bam"
+      featureCounts -p -T $num_threads -t $feature_type -g $gene_attribute -s $strandedness -a $referenceannotation -o feature_counts.txt "$bam_out"/*.sorted.bam
     fi
     awk '{$2=$3=$4=$5=$6=""; print $0}' OFS='\t' feature_counts.txt | grep -v "#" | sed 's/\t\+/\t/g;s/^\t//' > temp.txt && mv temp.txt feature_counts.txt
 }
