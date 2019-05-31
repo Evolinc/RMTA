@@ -299,8 +299,9 @@ stringtie_non_SRA()
         echo "####################"
         echo "cuffcompare "$bam_out"/$filename3.gtf.filtered.gtf -r $referenceannotation -o $filename3"
         cuffcompare "$bam_out"/$filename3.gtf.filtered.gtf -r $referenceannotation -o $filename3
-        rm listtoremove.txt
-        mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+        rm listtoremove.txt *.tracking *.loci *.stats 
+        mv *.combined.gtf "$bam_out"
+        rm "$bam_out"/*refmap "$bam_out"/*tmap
       fi
     fi
 }
@@ -424,8 +425,9 @@ stringtie_non_SRA_single()
         echo "####################"
         echo "cuffcompare "$bam_out"/$filename.gtf.filtered.gtf -r $referenceannotation -o $filename"
         cuffcompare "$bam_out"/$filename.gtf.filtered.gtf -r $referenceannotation -o $filename
-        rm listtoremove.txt
-        mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+        rm listtoremove.txt *.tracking *.loci *.stats 
+        mv *.combined.gtf "$bam_out"
+        rm "$bam_out"/*refmap "$bam_out"/*tmap
       fi
     fi
 }
@@ -552,8 +554,9 @@ stringtie_SRA_single()
         echo "####################"
         echo "cuffcompare "$bam_out"/$sra_id.gtf.filtered.gtf -r $referenceannotation -o $sra_id"
         cuffcompare "$bam_out"/$sra_id.gtf.filtered.gtf -r $referenceannotation -o $sra_id
-        rm listtoremove.txt
-        mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+        rm listtoremove.txt *.tracking *.loci *.stats 
+        mv *.combined.gtf "$bam_out"
+        rm "$bam_out"/*refmap "$bam_out"/*tmap
       fi
     fi
 }
@@ -730,8 +733,9 @@ stringtie_SRA_multi()
         echo "####################"
         echo "cuffcompare "$bam_out"/$f.gtf.filtered.gtf -r $referenceannotation -o $f"
         cuffcompare "$bam_out"/$f.gtf.filtered.gtf -r $referenceannotation -o $f
-        rm listtoremove.txt
-        mv *.tracking *.loci *.combined.gtf *.stats "$bam_out"
+        rm listtoremove.txt *.tracking *.loci *.stats 
+        mv *.combined.gtf "$bam_out"
+        rm "$bam_out"/*refmap "$bam_out"/*tmap
       fi
     fi
 }
@@ -1078,7 +1082,7 @@ elif [ ! -z "$single_reads" ]; then
 elif [ ! -z $sra_id ]; then
   if [[ -f $sra_id ]]; then
     if [ "$fastqc" != 0 ]; then
-      mkdir -p $bam_out/Fasqc_out
+      mkdir -p $bam_out/Fastqc_out
     else
       mkdir "$bam_out" 
     fi  
@@ -1127,17 +1131,19 @@ elif [ ! -z $sra_id ]; then
           picard SamToFastq I="$f".bam FASTQ="$f".fastq
           fastqc "$f".fastq
           mkdir "$f".fastqc_out
-          mv "$f".fastq *.zip *.html "$f".fastqc_out
+          rm "$f".fastq
+          mv *.zip *.html "$f".fastqc_out
         elif [ "$seq_type" == "PE" ]; then
           picard SamToFastq I="$f".bam FASTQ="$f"."R1".fastq SECOND_END_FASTQ="$f"."R2".fastq
           fastqc "$f"."R1".fastq "$f"."R2".fastq
           mkdir "$f".fastqc_out
-          mv "$f".*.fastq *.zip *.html "$f".fastqc_out
+          rm "$f".*.fastq
+          mv *.zip *.html "$f".fastqc_out
         fi
       fi
     done < "$sra_id"
       if [ "$fastqc" != 0 ]; then
-        mv *.fastqc_out "$bam_out/Fasqc_out"
+        mv *.fastqc_out "$bam_out/Fastqc_out"
       fi
       if [ "$hisat" != 0 ]; then
         featurecounts
@@ -1190,15 +1196,17 @@ elif [ ! -z $sra_id ]; then
         picard SamToFastq I=$sra_id.bam FASTQ="$sra_id".fastq
         fastqc "$sra_id".fastq
         mkdir fastqc_out
-        mv "$sra_id".fastq *.zip *.html fastqc_out
-        mv fastqc_out "$bam_out/Fasqc_out"
+        rm "$sra_id".fastq
+        mv *.zip *.html fastqc_out
+        mv fastqc_out "$bam_out/Fastqc_out"
       elif [ "$seq_type" == "PE" ]; then
         picard SamToFastq I=$sra_id.bam FASTQ="$sra_id"."R1".fastq SECOND_END_FASTQ="$sra_id"."R2".fastq
         echo "fastqc "$sra_id"."R1".fastq "$sra_id"."R2".fastq"
         fastqc "$sra_id"."R1".fastq "$sra_id"."R2".fastq
         mkdir fastqc_out
-        mv "$sra_id".*.fastq *.zip *.html fastqc_out
-        mv fastqc_out "$bam_out/Fasqc_out"
+        rm "$sra_id".*.fastq
+        mv *.zip *.html fastqc_out
+        mv fastqc_out "$bam_out/Fastqc_out"
       fi
     fi
     if [ "$hisat" != 0 ]; then
