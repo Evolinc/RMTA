@@ -23,53 +23,67 @@ Since there are several dependencies (these can be seen in Dockerfile) for runni
 
 ```
 # Pull the image from Dockerhub
-docker pull evolinc/rmta:2.1
+docker pull evolinc/rmta:2.5.1.1
 ```
 
 ```
 # See the command line help for the image
-docker run evolinc/rmta:2.1 -h
+docker run evolinc/rmta:2.5.1.1 -h
 ```
 
 ```
-# Run rmta on the test data. The sample data can be found in the sample_data folder in this (https://github.com/Evolinc/RMTA/tree/master/sample_data) 
+# Run rmta on the test data. The sample data can be found in the sample_data folder in this (https://github.com/Evolinc/RMTA/tree/master/sample_data_arabi) 
 git clone https://github.com/Evolinc/RMTA.git
-cd RMTA/sample_data
+cd RMTA/sample_data_arabi
 ```
 
 ```
-# Hisat2 + Stringtie with two fastq files
-docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.1 -g \
-Sorghum_bicolor.Sorbi1.20.dna.toplevel_chr8.fa -A \
-Sorghum_bicolor.Sorbi1.20_chr8.gtf -l "FR" -1 sample_1_R1.fq.gz -1 \
-sample_2_R1.fq.gz -2 sample_1_R2.fq.gz -2 sample_2_R2.fq.gz -O final_out \
--p 6 -5 0 -3 0 -m 20 -M 50000 -q -t -f 2 -k 2
+# RMTA with Stringtie assembler with two paired-end fastq files with FASTqc enabled
+docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.5.1.1 -g \
+genome_chr1.fa -A annotation_chr1.gtf -l "US" -y "PE" -1 \
+SRR2037320_R1.fastq.gz -1 SRR2932454_R1.fastq.gz -2 \
+SRR2037320_R2.fastq.gz -2 SRR2932454_R2.fastq.gz -O final_out -p 6 \
+-5 0 -3 0 -m 20 -M 50000 -q -t -e -u "exon" -a "gene_id" -f 1 -k 1
 ```
 
 ```
-# Hisat2 + Cufflinks with two fastq files
-docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.1 -g \
-Sorghum_bicolor.Sorbi1.20.dna.toplevel_chr8.fa -A \
-Sorghum_bicolor.Sorbi1.20_chr8.gtf -l "FR" -1 sample_1_R1.fq.gz -1 \
-sample_2_R1.fq.gz -2 sample_1_R2.fq.gz -2 sample_2_R2.fq.gz -O final_out \
--p 6 -5 0 -3 0 -m 20 -M 50000 -q -c -f 2 -k 2
+# RMTA with Stringtie assembler with two single-end fastq files with no FASTqc
+docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.5.1.1 -g \
+genome_chr1.fa -A annotation_chr1.gtf -l "US" -y "SE" -U SRR3464102.fastq.gz -U \
+SRR3464103.fastq.gz -O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -q -t \
+-u "exon" -a "gene_id" -f 1 -k 1
 ```
 
 ```
-# One SRA id
-docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.1 -g Sorghum_bicolor.Sorbi1.20.dna.toplevel_chr8.fa -A Sorghum_bicolor.Sorbi1.20_chr8.gtf -l "FR" -s "SRR3993757" \
--O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -q -t -f 2 -k 2
+# RMTA with Stringtie assembler with one single-end fastq file
+docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.5.1.1 -g \
+genome_chr1.fa -A annotation_chr1.gtf -l "US" -y "SE" -U SRR3464102.fastq.gz \
+-O final_out -p 3 -5 0 -3 0 -m 20 -M 50000 -q -t -e -u "exon" -a "gene_id" -f 1 -k 1
 ```
 
 ```
-# Multiple SRA's
-docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.1 -g Sorghum_bicolor.Sorbi1.20.dna.toplevel_chr8.fa -A Sorghum_bicolor.Sorbi1.20_chr8.gtf -l "FR" -s sra_id.txt \
--O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -q -t -f 2 -k 2
+# RMTA with Stringtie assembler with one single-end fastq file with Bowtie mapper, FASTqc enabled, and duplicate reads removed
+docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.5.1.1 -g \
+genome_chr1.fa -A annotation_chr1.gtf -l "US" -y "SE" -U SRR3464102.fastq.gz \
+-O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -q -b -d -e -u "exon" -a "gene_id" -f 1 -k 1
+```
+
+```
+# One SRA id with paired-ended RNA-sequencing data running HiSat2 and FASTqc
+docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.5.1.1 -g genome_chr1.fa -A  \ 
+annotation_chr1.gtf -l "US" -s "SRR2037320" -y "PE" \
+-O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -q -t -e -u "exon" -a "gene_id" -f 1 -k 1
+```
+
+```
+# Multiple PE SRA's with strand-specific (forward) reads without FASTqc option
+docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.5.1.1 -g genome_chr1.fa -A annotation_chr1.gtf -l "FR" -s sra_id.txt \
+-O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -q -t -f 1 -k 1 -u "exon" -a "gene_id"
 ```
 
 ### Using CyVerse Discovery Environment
 
-The RMTA v2.1 app (Search for "RMTA" and then select the 2.1 version) is currently integrated in CyVerse’s Discovery Environment (DE) and is free to use by researchers. The complete tutorial is available at this [CyVerse wiki](https://wiki.cyverse.org/wiki/display/TUT/RMTA+v2.1). CyVerse's DE is a free and easy to use GUI that simplifies many aspects of running bioinformatics analyses. If you do not currently have access to a high performance computing cluster, consider taking advantange of the DE.
+The RMTA v2.1 app (Search for "RMTA" and then select the 2.5.1.1 version) is currently integrated in CyVerse’s Discovery Environment (DE) and is free to use by researchers. The complete tutorial is available at this [CyVerse wiki](https://wiki.cyverse.org/wiki/display/DEapps/RMTA+v2.5.1.1). CyVerse's DE is a free and easy to use GUI that simplifies many aspects of running bioinformatics analyses. If you do not currently have access to a high performance computing cluster, consider taking advantange of the DE.
 
 # Issues
 If you experience any issues with running RMTA (DE app or source code or Docker image), please open an issue on this github repo. Alternatively you can post your queries and feature requests in this [google groups](https://groups.google.com/forum/#!forum/evolinc)
