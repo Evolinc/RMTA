@@ -18,13 +18,13 @@ cat <<'EOF'
 
   -A <reference genome annotation>
 
-  -l Library type
+  -l Library type #note that this is a lower case L
 
   -1 <reads_1>
-               # Make sure both the paired end reads are present
+               # Ends with R1 and is in the same order as reverse reads
   -2 <reads_2>
-
-  -U <single_reads> # Don not use Single Reads along with Paired end reads
+               # Ends with R2, must be present, and is in the same order as forward reads
+  -U <single_reads> # Do not use Single Reads along with Paired end reads
 
   -O </path/to/bam output folder>
 
@@ -32,35 +32,35 @@ cat <<'EOF'
 
   -p Number of threads
   
-  -5 5' trim 
+  -5 5' trim #Integers only
  
-  -3 3' trim
+  -3 3' trim #Integers only
 
-  -Q phred64 
+  -Q phred64 #phred33 is default if this flag is not activated
 
   -m Minimum intron length
 
   -M Maximum intron length
 
-  -f Coverage 
+  -f Coverage #Read per base coverage filter, integers from 0-5 only
 
-  -k threshold # FPKM threshold to filter
+  -k threshold # FPKM threshold to filter, integers from 0-5 only
 
   -e Fastqc
 
-  -d Remove duplicates
+  -d Remove duplicates #intended for use with the Bowtie2 option
 
   -t Hisat2 mapping
 
-  -b Bowtie2 mapping
+  -b Bowtie2 mapping #deactivates Stringtie
 
-  -t Type of reads (Single end or Paired end)
+  -y Type of reads (Single end or Paired end) #denoted as "SE" or "PE", include quotes on command line
 
-  -u Feature type (Default is exon)
+  -u Feature type (Default is exon) #Feature counts option; can include any feature annotation in the provided GTF/GFF
 
-  -a Gene attribute (Default is gene_id)
+  -a Gene attribute (Default is gene_id) #Feature counts option; should be the starting label in column 9 of your GTF/GFF
 
-  -n Strandedness (Default is 0 (unstranded), 1 (stranded), 2 (reversely stranded))
+  -n Strandedness (Default is 0 (unstranded), 1 (stranded), 2 (reversely stranded)) #Feature counts option; separate strand information for Featurecounts
 
 EOF
     exit 0
@@ -165,7 +165,7 @@ while getopts ":hg:i:A:l:1:2:U:O:s:p:5:3:f:Qedtbm:M:k:y:u:a:n:" opt; do
 done
 
 # ############################################################################################################################################################################################################################
-## Functions ###
+### Functions ###
 # ############################################################################################################################################################################################################################
 
 #Define parameters for coverage/base filtering
@@ -484,7 +484,7 @@ coverge_cuffoff_SRA_single()
     fi
 }
 
-# FPKM cut-off cunction for Single SRAs
+# FPKM cut-off function for Single SRAs
 
 fpkm_cuffoff_SRA_single()
 {
@@ -558,6 +558,11 @@ stringtie_SRA_single()
         mv *.combined.gtf "$bam_out"
         rm "$bam_out"/*refmap "$bam_out"/*tmap
       fi
+    else 
+      echo "###################"
+      echo "Bowtie was selected, skipping Stringtie"
+      echo "####################"
+      mv $sra_id.sorted.bam $sra_id.sorted.bam.bai "$bam_out"
     fi
 }
 
@@ -737,6 +742,11 @@ stringtie_SRA_multi()
         mv *.combined.gtf "$bam_out"
         rm "$bam_out"/*refmap "$bam_out"/*tmap
       fi
+    else 
+      echo "###################"
+      echo "Bowtie was selected, skipping Stringtie"
+      echo "####################"
+      mv $sra_id.sorted.bam $sra_id.sorted.bam.bai "$bam_out"
     fi
 }
 
