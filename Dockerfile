@@ -39,6 +39,7 @@ RUN conda install picard==2.18.27
 RUN conda install fastqc==0.11.8
 RUN conda install cufflinks==2.2.1
 RUN conda install subread==1.6.3
+RUN conda install salmon==0.14.1
 
 # Bowtie2
 WORKDIR /
