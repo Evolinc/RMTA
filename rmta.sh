@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# set -x
+set -x
 # set -e
 
 usage() {
@@ -790,7 +790,8 @@ paired_fq_gz()
     filename=$(basename "$f" ".fq.gz")
     filename2=${filename/_R1/_R2}
     filename3=$(echo $filename | sed 's/_R1//')
-    if [ "$referencegenome" != 0 ]; then
+    if [ "$referencegenome" != 0 ] || [ "$index_folder" != 0 ]; then
+      mkdir $bam_out
 	    if [ "$fastqc" != 0 ]; then
 	      fastqc ${filename}.fq.gz ${filename2}.fq.gz
 	      mkdir "$filename3".fastqc_out
@@ -846,7 +847,8 @@ paired_fq()
     filename=$(basename "$f" ".fq")
     filename2=${filename/_R1/_R2}
     filename3=$(echo $filename | sed 's/_R1//')
-    if [ "$referencegenome" != 0 ]; then
+    if [ "$referencegenome" != 0 ] || [ "$index_folder" != 0 ]; then
+      mkdir $bam_out
 	    if [ "$fastqc" != 0 ]; then
 	      fastqc ${filename}.fq ${filename2}.fq
 	      mkdir "$filename3".fastqc_out
@@ -902,7 +904,8 @@ paired_fastq_gz()
     filename=$(basename "$f" ".fastq.gz")
     filename2=${filename/_R1/_R2}
     filename3=$(echo $filename | sed 's/_R1//')
-    if [ "$referencegenome" != 0 ]; then
+    if [ "$referencegenome" != 0 ] || [ "$index_folder" != 0 ]; then
+      mkdir $bam_out
 	    if [ "$fastqc" != 0 ]; then
 	      fastqc ${filename}.fastq.gz ${filename2}.fastq.gz
 	      mkdir "$filename3".fastqc_out
@@ -958,7 +961,8 @@ paired_fastq()
     filename=$(basename "$f" ".fastq")
     filename2=${filename/_R1/_R2}
     filename3=$(echo $filename | sed 's/_R1//')
-    if [ "$referencegenome" != 0 ]; then
+    if [ "$referencegenome" != 0 ] || [ "$index_folder" != 0 ]; then
+      mkdir $bam_out
 	    if [ "$fastqc" != 0 ]; then
 	      fastqc ${filename}.fastq ${filename2}.fastq
 	      mkdir "$filename3".fastqc_out
@@ -1166,7 +1170,7 @@ elif [ ! -z "$single_reads" ]; then
 
 elif [ ! -z $sra_id ]; then
   if [[ -f $sra_id ]]; then
-  	if [ "$referencegenome" != 0 ]; then
+  	if [ "$referencegenome" != 0 ] || [ "$index_folder" != 0 ]; then
 	    if [ "$fastqc" != 0 ]; then
 	      mkdir -p $bam_out/Fastqc_out
 	    else
@@ -1268,7 +1272,7 @@ elif [ ! -z $sra_id ]; then
 	    done < "$sra_id"
     fi
   else
-  	if [ "$referencegenome" != 0 ]; then
+  	if [ "$referencegenome" != 0 ] || [ "$index_folder" != 0 ]; then
     	mkdir "$bam_out"
     	echo "------------------------------------------" >> mapped.txt
     	echo "### Mapping percentages of" $sra_id "###" >> mapped.txt
