@@ -1247,7 +1247,7 @@ elif [ ! -z $sra_id ]; then
 	      echo "#######################"
 			if [ "$transcriptome" != 0 ]; then
 				if [ "$seq_type" == "SE" ]; then
-					parallel-fastq-dump -s $f -t $num_threads --gzip
+					fastq-dump -A $f --gzip
       				salmon quant -i salmon_index -l A -r $f."fastq.gz" -p $num_threads --validateMappings -o $f.quant
       				if [ "$fastqc" != 0 ]; then
       					mkdir $f.fastqc
@@ -1257,7 +1257,7 @@ elif [ ! -z $sra_id ]; then
       					rm $f."fastq.gz"
       				fi
       			elif [ "$seq_type" == "PE" ]; then
-      				parallel-fastq-dump -s $f -t $num_threads --gzip --split-files
+      				fastq-dump -A $f --gzip --split-files
       				salmon quant -i salmon_index -l A -1 $f"_1".fastq.gz -2 $f"_2".fastq.gz -p $num_threads --validateMappings -o $f.quant
       				if [ "$fastqc" != 0 ]; then
       					mkdir $f"_1".fastqc $f"_2".fastqc
@@ -1339,7 +1339,7 @@ elif [ ! -z $sra_id ]; then
   	else
 		if [ "$transcriptome" != 0 ]; then
 			if [ "$seq_type" == "SE" ]; then
-				parallel-fastq-dump -s $sra_id -t $num_threads --gzip
+				fastq-dump -A $sra_id --gzip
       			salmon quant -i salmon_index -l A -r $sra_id."fastq.gz" -p $num_threads --validateMappings -o $sra_id.quant
       			if [ "$fastqc" != 0 ]; then
       				mkdir $sra_id.fastqc
@@ -1349,7 +1349,7 @@ elif [ ! -z $sra_id ]; then
       				rm $sra_id."fastq.gz"
       			fi
       		elif [ "$seq_type" == "PE" ]; then
-      			parallel-fastq-dump -s $sra_id -t $num_threads --gzip --split-files
+      			fastq-dump -A $sra_id --gzip --split-files
       			salmon quant -i salmon_index -l A -1 $sra_id"_1".fastq.gz -2 $sra_id"_2".fastq.gz -p $num_threads --validateMappings -o $sra_id.quant
       			if [ "$fastqc" != 0 ]; then
       				mkdir $sra_id"_1".fastqc $sra_id"_2".fastqc

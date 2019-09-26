@@ -7,10 +7,10 @@ RUN apt-get update && apt-get install -y build-essential \
                                          python3 \
                                          wget \
                                          unzip \
-					 					 build-essential \
-        				 				 zlib1g-dev \
-        				 				 libncurses5-dev \
-        				 				 software-properties-common
+					 build-essential \
+        				 zlib1g-dev \
+        				 libncurses5-dev \
+        				 software-properties-common
 
 RUN add-apt-repository -y ppa:openjdk-r/ppa
 RUN apt-get update && apt-get install -y openjdk-8-jdk libbz2-dev liblzma-dev
@@ -30,7 +30,6 @@ RUN conda config --add channels bioconda
 
 # Conda packages
 RUN conda install sra-tools==2.9.1_1
-RUN conda install parallel-fastq-dump==0.6.3
 RUN conda install hisat2==2.1.0
 RUN conda install stringtie==1.3.4
 RUN conda install samtools==1.9
