@@ -60,7 +60,7 @@ SRR2037320_R2.fastq.gz -2 SRR2932454_R2.fastq.gz -O final_out -p 6 \
 # RMTA with Stringtie assembler with two single-end fastq files with no FASTqc
 docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.1 -g \
 genome_chr1.fa -A annotation_chr1.gtf -l "US" -y "SE" -U SRR3464102.fastq.gz -U \
-SRR3464103.fastq.gz -O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -q -t \
+SRR3464103.fastq.gz -O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -Q -t \
 -u "exon" -a "gene_id" -n 0 -f 1 -k 1
 ```
 
