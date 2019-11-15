@@ -80,7 +80,7 @@ genome_chr1.fa -A annotation_chr1.gtf -l "US" -y "SE" -U SRR3464102.fastq.gz \
 
 ```
 # One SRA id with paired-ended RNA-sequencing data running HiSat2 and FASTqc
-$ docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.1 -g genome_chr1.fa -A  \ 
+$ docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.1 -g genome_chr1.fa -A  \
 annotation_chr1.gtf -l "US" -s "SRR2037320" -y "PE" \
 -O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -t -e -u "exon" -a "gene_id" -n 0 -f 1 -k 1
 ```
