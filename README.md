@@ -96,6 +96,34 @@ $ docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.1 -g genome_chr1.fa -A
 docker run --rm $PWD:/data -w /data evolinc/rmta:2.6.1 -r athal.fa.gz -s SRR2037320 -y "PE" -e -O RMTA_out -p 6
 ```
 
+| Command Line Argument | Description |
+| --------------------- | ----------- |
+| -g | reference genome fasta file |
+| -i | reference genome index folder |
+| -A | reference genome annotation |
+| -l | Library type #note that this is a lower case L |
+| -1 | reads_1 |
+| -2 | reads_2 |
+| -U | single_reads |
+| -O | /path/to/bam output folder |
+| -s | SRA ID # One SRA ID or multiple SRA ID's in a file | 
+| -p | Number of threads |
+| -5 | 5' trim #Integers only |
+| -3 | 3' trim #Integers only |
+| -Q | phred64 #phred33 is default |
+| -m | Minimum intron length |
+| -M | Maximum intron length |
+| -f | Coverage #Read per base coverage filter, integers from 0-5 only |
+| -k | threshold # FPKM threshold to filter, integers from 0-5 only |
+| -e | Fastqc |
+| -d | Remove duplicates #intended for use with the Bowtie2 option |
+| -t | Hisat2 mapping |
+| -b | Bowtie2 mapping #deactivates Stringtie |
+| -y | Type of reads (Single end or Paired end) #denoted as "SE" or "PE", include quotes on command line |
+| -u | Feature type (Default is exon) #Feature counts option; can include any feature annotation in the provided GTF/GFF |
+| -a | Gene attribute (Default is gene_id) #Feature counts option; should be the starting label in column 9 of your GTF/GFF |
+| -n | Strandedness (Default is 0 (unstranded), 1 (stranded), 2 (reversely stranded)) |
+
 ### Using CyVerse Discovery Environment
 
 The RMTA v2.6.1 app (Search for "RMTA" and then select the 2.6.1 version) is currently integrated in CyVerse’s Discovery Environment (DE) and is free to use by researchers. The complete tutorial is available at this [CyVerse wiki](https://wiki.cyverse.org/wiki/display/DEapps/RMTA+v2.6.1). CyVerse's DE is a free and easy to use GUI that simplifies many aspects of running bioinformatics analyses. If you do not currently have access to a high performance computing cluster, consider taking advantange of the DE.
