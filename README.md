@@ -128,6 +128,10 @@ docker run --rm $PWD:/data -w /data evolinc/rmta:2.6.1 -r athal.fa.gz -s SRR2037
 
 The RMTA v2.6.1 app (Search for "RMTA" and then select the 2.6.1 version) is currently integrated in CyVerse’s Discovery Environment (DE) and is free to use by researchers. The complete tutorial is available at this [CyVerse wiki](https://wiki.cyverse.org/wiki/display/DEapps/RMTA+v2.6.1). CyVerse's DE is a free and easy to use GUI that simplifies many aspects of running bioinformatics analyses. If you do not currently have access to a high performance computing cluster, consider taking advantange of the DE.
 
+### Using RMTA on a High-Performance Computer (HPC)
+
+Singularity is an open source container platform designed to be simple, fast, and secure. Singularity is optimized for EPC and HPC workloads, allowing untrusted users to run untrusted containers in a trusted way. Singularity is also good friends with Docker, hence the RMTA docker containers can be deployed on HPC using Singularity. See more documentation [here](https://singularity.lbl.gov/docs-docker).
+
 # Issues
 If you experience any issues with running RMTA (DE app or source code or Docker image), please open an issue on this github repo. Alternatively you can post your queries and feature requests in this [google groups](https://groups.google.com/forum/#!forum/evolinc)
 
