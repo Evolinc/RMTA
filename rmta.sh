@@ -934,7 +934,9 @@ paired_fastq_gz()
     filename3=$(echo $filename | sed 's/_R1//')
     if [ "$referencegenome" != 0 ] || [ "$index_folder" != 0 ]; then
       if [ "$transcriptome" == 0 ]; then
-        mkdir $bam_out
+        if [ ! -d "$DIRECTORY" ]; then
+              mkdir $bam_out
+        fi
   	    if [ "$fastqc" != 0 ]; then
   	      fastqc ${filename}.fastq.gz ${filename2}.fastq.gz
   	      mkdir "$filename3".fastqc_out
