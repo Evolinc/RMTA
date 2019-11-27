@@ -70,8 +70,8 @@ docker run evolinc/rmta:2.6.2 -h
 
 ```
 # Run rmta on the test data. The sample data can be found in the sample_data folder in this repository (https://github.com/Evolinc/RMTA/tree/master/sample_data_arabi) 
-$ git clone https://github.com/Evolinc/RMTA.git
-$ cd RMTA/sample_data_arabi
+git clone https://github.com/Evolinc/RMTA.git
+cd RMTA/sample_data_arabi
 ```
 
 ```
@@ -85,7 +85,7 @@ SRR2037320_R2.fastq.gz -2 SRR2932454_R2.fastq.gz -O final_out -p 6 \
 
 ```
 # RMTA with Stringtie assembler with two single-end fastq files with no FASTqc
-$ docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -g \
+docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -g \
 genome_chr1.fa -A annotation_chr1.gtf -l "US" -y "SE" -U SRR3464102.fastq.gz -U \
 SRR3464103.fastq.gz -O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -Q -t \
 -u "exon" -a "gene_id" -n 0 -f 1 -k 1
@@ -93,28 +93,28 @@ SRR3464103.fastq.gz -O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -Q -t \
 
 ```
 # RMTA with Stringtie assembler with one single-end fastq file
-$ docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -g \
+docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -g \
 genome_chr1.fa -A annotation_chr1.gtf -l "US" -y "SE" -U SRR3464102.fastq.gz \
 -O final_out -p 3 -5 0 -3 0 -m 20 -M 50000 -t -e -u "exon" -a "gene_id" -n 0 -f 1 -k 1
 ```
 
 ```
 # RMTA with Stringtie assembler with one single-end fastq file with Bowtie mapper, FASTqc enabled, and duplicate reads removed
-$ docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -g \
+docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -g \
 genome_chr1.fa -A annotation_chr1.gtf -l "US" -y "SE" -U SRR3464102.fastq.gz \
 -O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -b -d -e -u "exon" -a "gene_id" -n 0 -f 1 -k 1
 ```
 
 ```
 # One SRA id with paired-ended RNA-sequencing data running HiSat2 and FASTqc
-$ docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -g genome_chr1.fa -A  \ 
+docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -g genome_chr1.fa -A  \ 
 annotation_chr1.gtf -l "US" -s "SRR2037320" -y "PE" \
 -O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -t -e -u "exon" -a "gene_id" -n 0 -f 1 -k 1
 ```
 
 ```
 # Multiple PE SRA's with strand-specific (forward) reads without FASTqc option
-$ docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -g genome_chr1.fa -A annotation_chr1.gtf -l "FR" -y "PE" -s sra_id_pe.txt \
+docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -g genome_chr1.fa -A annotation_chr1.gtf -l "FR" -y "PE" -s sra_id_pe.txt \
 -O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -t -f 1 -k 1 -u "exon" -a "gene_id" -n 1
 ```
 
