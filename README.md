@@ -8,7 +8,6 @@
 
 ## Introduction
 
-
 + RMTA is a workflow that can rapidly process raw RNA-seq illumina data by mapping reads to a genome (HiSat2) and then assemble transcripts using Stringtie.
 + RMTA can process FASTq files containing paired-end or single-end reads. Alternatively, RMTA can directly process one or more sequence read archives (SRA) from NCBI using a SRA ID.
 + RMTA also supports for read alignment directly to a transcriptome using the quasi-aligner  and transcript abundance quantifier Salmon (Rob et al., 2017; Srivastava et al., 2019). Salmon maps reads to the provided transcript assembly and then counts the number of reads associated with each transcript, generating an output file (quant.sf) that can immediately be used for differential expression. **Note:** The utilization of Salmon is only appropriate when the user is wanting to rapidly test for differential expression and cannot facilitate the identification of novel genes or data visualization in a genome browser. 
@@ -41,10 +40,38 @@ docker pull evolinc/rmta:2.6.2
 docker run evolinc/rmta:2.6.2 -h
 ```
 
+| Command Line Argument | Description |
+| --------------------- | ----------- |
+| -g | reference genome fasta file |
+| -i | reference genome index folder |
+| -A | reference genome annotation |
+| -l | Library type #note that this is a lower case L |
+| -1 | reads_1 |
+| -2 | reads_2 |
+| -U | single_reads |
+| -O | /path/to/bam output folder |
+| -s | SRA ID # One SRA ID or multiple SRA ID's in a file | 
+| -p | Number of threads |
+| -5 | 5' trim #Integers only |
+| -3 | 3' trim #Integers only |
+| -Q | phred64 #phred33 is default |
+| -m | Minimum intron length |
+| -M | Maximum intron length |
+| -f | Coverage #Read per base coverage filter, integers from 0-5 only |
+| -k | threshold # FPKM threshold to filter, integers from 0-5 only |
+| -e | Fastqc |
+| -d | Remove duplicates #intended for use with the Bowtie2 option |
+| -t | Hisat2 mapping |
+| -b | Bowtie2 mapping #deactivates Stringtie |
+| -y | Type of reads (Single end or Paired end) #denoted as "SE" or "PE", include quotes on command line |
+| -u | Feature type (Default is exon) #Feature counts option; can include any feature annotation in the provided GTF/GFF |
+| -a | Gene attribute (Default is gene_id) #Feature counts option; should be the starting label in column 9 of your GTF/GFF |
+| -n | Strandedness (Default is 0 (unstranded), 1 (stranded), 2 (reversely stranded)) |
+
 ```
-# Run rmta on the test data. The sample data can be found in the sample_data folder in this (https://github.com/Evolinc/RMTA/tree/master/sample_data_arabi) 
-git clone https://github.com/Evolinc/RMTA.git
-cd RMTA/sample_data_arabi
+# Run rmta on the test data. The sample data can be found in the sample_data folder in this repository (https://github.com/Evolinc/RMTA/tree/master/sample_data_arabi) 
+$ git clone https://github.com/Evolinc/RMTA.git
+$ cd RMTA/sample_data_arabi
 ```
 
 ```
@@ -60,7 +87,7 @@ SRR2037320_R2.fastq.gz -2 SRR2932454_R2.fastq.gz -O final_out -p 6 \
 # RMTA with Stringtie assembler with two single-end fastq files with no FASTqc
 $ docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -g \
 genome_chr1.fa -A annotation_chr1.gtf -l "US" -y "SE" -U SRR3464102.fastq.gz -U \
-SRR3464103.fastq.gz -O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -q -t \
+SRR3464103.fastq.gz -O final_out -p 6 -5 0 -3 0 -m 20 -M 50000 -Q -t \
 -u "exon" -a "gene_id" -n 0 -f 1 -k 1
 ```
 
@@ -96,41 +123,22 @@ $ docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -g genome_chr1.fa -A
 docker run --rm -v $PWD:/data -w /data evolinc/rmta:2.6.2 -r athal.fa.gz -s SRR2037320 -y "PE" -e -O RMTA_out -p 6
 ```
 
-| Command Line Argument | Description |
-| --------------------- | ----------- |
-| -g | reference genome fasta file |
-| -i | reference genome index folder |
-| -A | reference genome annotation |
-| -l | Library type #note that this is a lower case L |
-| -1 | reads_1 |
-| -2 | reads_2 |
-| -U | single_reads |
-| -O | /path/to/bam output folder |
-| -s | SRA ID # One SRA ID or multiple SRA ID's in a file | 
-| -p | Number of threads |
-| -5 | 5' trim #Integers only |
-| -3 | 3' trim #Integers only |
-| -Q | phred64 #phred33 is default |
-| -m | Minimum intron length |
-| -M | Maximum intron length |
-| -f | Coverage #Read per base coverage filter, integers from 0-5 only |
-| -k | threshold # FPKM threshold to filter, integers from 0-5 only |
-| -e | Fastqc |
-| -d | Remove duplicates #intended for use with the Bowtie2 option |
-| -t | Hisat2 mapping |
-| -b | Bowtie2 mapping #deactivates Stringtie |
-| -y | Type of reads (Single end or Paired end) #denoted as "SE" or "PE", include quotes on command line |
-| -u | Feature type (Default is exon) #Feature counts option; can include any feature annotation in the provided GTF/GFF |
-| -a | Gene attribute (Default is gene_id) #Feature counts option; should be the starting label in column 9 of your GTF/GFF |
-| -n | Strandedness (Default is 0 (unstranded), 1 (stranded), 2 (reversely stranded)) |
+### Using RMTA on a High-Performance Computer (HPC)
+
+Singularity is an open source container platform designed to be simple, fast, and secure. Singularity is optimized for EPC and HPC workloads, allowing untrusted users to run untrusted containers in a trusted way. Singularity is also good friends with Docker, hence the RMTA docker containers can be deployed on HPC using Singularity. See more documentation [here](https://sylabs.io/guides/3.4/user-guide/).
+
+### When using Singularity
+
+When using Singularity, you just have to replace `docker run --rm $PWD:/data -w /data evolinc/rmta:2.6.2` with `singularity run docker://evolinc/rmta:2.6.2`. For example:
+
+```
+# transcriptome guided assembly using Salmon
+singularity run docker://evolinc/rmta:2.6.2 -r athal.fa.gz -s SRR2037320 -y "PE" -e -O final_out -p 6
+```
 
 ### Using CyVerse Discovery Environment
 
-The RMTA v2.6.1 app (Search for "RMTA" and then select the 2.6.1 version) is currently integrated in CyVerse’s Discovery Environment (DE) and is free to use by researchers. The complete tutorial is available at this [CyVerse wiki](https://wiki.cyverse.org/wiki/display/DEapps/RMTA+v2.6.1). CyVerse's DE is a free and easy to use GUI that simplifies many aspects of running bioinformatics analyses. If you do not currently have access to a high performance computing cluster, consider taking advantange of the DE.
-
-### Using RMTA on a High-Performance Computer (HPC)
-
-Singularity is an open source container platform designed to be simple, fast, and secure. Singularity is optimized for EPC and HPC workloads, allowing untrusted users to run untrusted containers in a trusted way. Singularity is also good friends with Docker, hence the RMTA docker containers can be deployed on HPC using Singularity. See more documentation [here](https://singularity.lbl.gov/docs-docker).
+The RMTA v2.6.2 app (Search for "RMTA" and then select the 2.6.2 version) is currently integrated in CyVerse’s Discovery Environment (DE) and is free to use by researchers. The complete tutorial is available at this [CyVerse wiki](https://wiki.cyverse.org/wiki/display/DEapps/RMTA+v2.6.2). CyVerse's DE is a free and easy to use GUI that simplifies many aspects of running bioinformatics analyses. If you do not currently have access to a high performance computing cluster, consider taking advantange of the DE.
 
 # Issues
 If you experience any issues with running RMTA (DE app or source code or Docker image), please open an issue on this github repo. Alternatively you can post your queries and feature requests in this [google groups](https://groups.google.com/forum/#!forum/evolinc)
