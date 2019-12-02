@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+# set -x
 # set -e
 
 usage() {
@@ -794,10 +794,14 @@ paired_fq_gz()
       if [ "$transcriptome" == 0 ]; then
         mkdir $bam_out
         if [ "$fastqc" != 0 ]; then
+          DIRECTORY=$bam_out/Fastqc_out
+          if [ ! -d "$DIRECTORY" ]; then
+            mkdir $DIRECTORY
+          fi
           fastqc ${filename}.fq.gz ${filename2}.fq.gz
           mkdir "$filename3".fastqc_out
           mv *.zip *.html "$filename3".fastqc_out
-          mv "$filename3".fastqc_out "$bam_out"
+          mv "$filename3".fastqc_out $DIRECTORY
         fi
         echo "------------------------------------------" >> mapped.txt
         echo "### Mapping percentages of" $filename3 "###" >> mapped.txt
@@ -863,12 +867,18 @@ paired_fq()
     filename3=$(echo $filename | sed 's/_R1//')
     if [ "$referencegenome" != 0 ] || [ "$index_folder" != 0 ]; then
       if [ "$transcriptome" == 0 ]; then
-        mkdir $bam_out
+        if [ ! -d "$bam_out" ]; then
+            mkdir $bam_out
+        fi
         if [ "$fastqc" != 0 ]; then
+          DIRECTORY=$bam_out/Fastqc_out
+          if [ ! -d "$DIRECTORY" ]; then
+            mkdir $DIRECTORY
+          fi
           fastqc ${filename}.fq ${filename2}.fq
           mkdir "$filename3".fastqc_out
           mv *.zip *.html "$filename3".fastqc_out
-          mv "$filename3".fastqc_out "$bam_out"
+          mv "$filename3".fastqc_out $DIRECTORY
         fi
         echo "------------------------------------------" >> mapped.txt
         echo "### Mapping percentages of" $filename3 "###" >> mapped.txt
@@ -934,14 +944,18 @@ paired_fastq_gz()
     filename3=$(echo $filename | sed 's/_R1//')
     if [ "$referencegenome" != 0 ] || [ "$index_folder" != 0 ]; then
       if [ "$transcriptome" == 0 ]; then
-        if [ ! -d "$DIRECTORY" ]; then
+        if [ ! -d "$bam_out" ]; then
               mkdir $bam_out
         fi
   	    if [ "$fastqc" != 0 ]; then
+          DIRECTORY=$bam_out/Fastqc_out
+          if [ ! -d "$DIRECTORY" ]; then
+            mkdir $DIRECTORY
+          fi
   	      fastqc ${filename}.fastq.gz ${filename2}.fastq.gz
   	      mkdir "$filename3".fastqc_out
   	      mv *.zip *.html "$filename3".fastqc_out
-  	      mv "$filename3".fastqc_out "$bam_out"
+  	      mv "$filename3".fastqc_out $DIRECTORY
   	    fi
   	    echo "------------------------------------------" >> mapped.txt
   	    echo "### Mapping percentages of" $filename3 "###" >> mapped.txt
@@ -1007,12 +1021,18 @@ paired_fastq()
     filename3=$(echo $filename | sed 's/_R1//')
     if [ "$referencegenome" != 0 ] || [ "$index_folder" != 0 ]; then
       if [ "$transcriptome" == 0 ]; then
-        mkdir $bam_out
+        if [ ! -d "$bam_out" ]; then
+              mkdir $bam_out
+        fi
         if [ "$fastqc" != 0 ]; then
+          DIRECTORY=$bam_out/Fastqc_out
+          if [ ! -d "$DIRECTORY" ]; then
+            mkdir $DIRECTORY
+          fi
           fastqc ${filename}.fastq ${filename2}.fastq
           mkdir "$filename3".fastqc_out
           mv *.zip *.html "$filename3".fastqc_out
-          mv "$filename3".fastqc_out "$bam_out"
+          mv "$filename3".fastqc_out $DIRECTORY
         fi
         echo "------------------------------------------" >> mapped.txt
         echo "### Mapping percentages of" $filename3 "###" >> mapped.txt
@@ -1077,7 +1097,9 @@ single_end()
     filename=$(basename "$f" ".$extension")
     if [ "$referencegenome" != 0 ] || [ "$index_folder" != 0 ]; then
       if [ "$transcriptome" == 0 ]; then
-        mkdir $bam_out
+        if [ ! -d "$bam_out" ]; then
+              mkdir $bam_out
+        fi
         echo "------------------------------------------" >> mapped.txt
         echo "### Mapping percentages of" $filename "###" >> mapped.txt
         echo "------------------------------------------" >> mapped.txt
@@ -1212,9 +1234,8 @@ elif [ ! -z "$single_reads" ]; then
 	numb=$(ls "${single_reads[@]}" | wc -l)
 	for f in "${single_reads[@]}"; do
     if [ "$transcriptome" != 0 ]; then
-      DIRECTORY=$bam_out
-      if [ ! -d "$DIRECTORY" ]; then
-            mkdir $DIRECTORY
+      if [ ! -d "$bam_out" ]; then
+            mkdir $bam_out
       fi
     fi
 		if [ "$fastqc" != 0 ]; then
@@ -1226,8 +1247,8 @@ elif [ ! -z "$single_reads" ]; then
   		mkdir "$f".fastqc_out
   		mv *.zip *.html "$f".fastqc_out
   		mv "$f".fastqc_out $DIRECTORY
-  		single_end
     fi
+    single_end
   done
     if [ "$transcriptome" == 0 ]; then
     	success_message
@@ -1241,11 +1262,7 @@ elif [ ! -z $sra_id ]; then
   if [[ -f $sra_id ]]; then
   	if [ "$referencegenome" != 0 ] || [ "$index_folder" != 0 ]; then
       if [ "$transcriptome" == 0 ]; then
-  	    if [ "$fastqc" != 0 ]; then
-  	      mkdir -p $bam_out/Fastqc_out
-  	    else
   	      mkdir "$bam_out" 
-  	    fi  
     	    while read f; do
   	      echo "------------------------------------------" >> mapped.txt
   	      echo "### Mapping percentages of" $f "###" >> mapped.txt
@@ -1303,7 +1320,11 @@ elif [ ! -z $sra_id ]; then
   	      fi
   	    done < "$sra_id"
   	      if [ "$fastqc" != 0 ]; then
-  	        mv *.fastqc_out "$bam_out/Fastqc_out"
+            DIRECTORY=$bam_out/Fastqc_out
+            if [ ! -d "$DIRECTORY" ]; then
+              mkdir -p $DIRECTORY
+            fi
+  	        mv *.fastqc "$bam_out/Fastqc_out"
   	      fi
   	      if [ "$hisat" != 0 ]; then
   	        featurecounts
@@ -1311,7 +1332,6 @@ elif [ ! -z $sra_id ]; then
   	      rm -r temp *.bam
   	      success_message
 	    else
-        mkdir -p $bam_out/Salmon_counts
     		while read f; do
     	      echo "#######################"
     	      echo "Running Salmon step"
@@ -1320,39 +1340,41 @@ elif [ ! -z $sra_id ]; then
     				if [ "$seq_type" == "SE" ]; then
     					fastq-dump -A $f --gzip
       				salmon quant -i salmon_index -l A -r $f."fastq.gz" -p $num_threads --validateMappings -o $f.quant
+              mkdir -p $bam_out/Salmon_counts
               mv $f.quant $bam_out/Salmon_counts
       				if [ "$fastqc" != 0 ]; then
-                DIRECTORY=$bam_out/Fastqc_out
-                if [ ! -d "$DIRECTORY" ]; then
-                  mkdir $DIRECTORY
-                fi
       					mkdir $f.fastqc
       					fastqc $f."fastq.gz" -o $f.fastqc
       					rm $f."fastq.gz"
-                mv $f.fastqc $DIRECTORY
       				else
       					rm $f."fastq.gz"
       				fi
       			elif [ "$seq_type" == "PE" ]; then
       				fastq-dump -A $f --gzip --split-files
       				salmon quant -i salmon_index -l A -1 $f"_1".fastq.gz -2 $f"_2".fastq.gz -p $num_threads --validateMappings -o $f.quant
+              mkdir -p $bam_out/Salmon_counts
               mv $f.quant $bam_out/Salmon_counts
       				if [ "$fastqc" != 0 ]; then
-                DIRECTORY=$bam_out/Fastqc_out
-                if [ ! -d "$DIRECTORY" ]; then
-                  mkdir $DIRECTORY
-                fi
       					mkdir $f"_1".fastqc $f"_2".fastqc
       					fastqc $f"_1".fastq.gz -o $f"_1".fastqc
       					fastqc $f"_2".fastq.gz -o $f"_2".fastqc
       					rm $f"_1".fastq.gz $f"_2".fastq.gz
-                mv $f"_1".fastqc $f"_2".fastqc $DIRECTORY
       				else
       					rm $f"_1".fastq.gz $f"_2".fastq.gz
       				fi
           	fi
           fi
     	 done < "$sra_id"
+      if [ "$fastqc" != 0 ]; then
+        DIRECTORY=$bam_out/Fastqc_out
+        if [ ! -d "$DIRECTORY" ]; then
+          mkdir -p $DIRECTORY
+        fi
+        mv *.fastqc "$bam_out/Fastqc_out"
+      fi
+      echo "##############################"
+      echo "Pipeline executed successfully"
+      echo "##############################"
     fi  
     fi
   else
@@ -1427,27 +1449,49 @@ elif [ ! -z $sra_id ]; then
 			     if [ "$seq_type" == "SE" ]; then
 				     fastq-dump -A $sra_id --gzip
       	     salmon quant -i salmon_index -l A -r $sra_id."fastq.gz" -p $num_threads --validateMappings -o $sra_id.quant
-             mv $sra_id.quant $bam_out
+             mkdir -p $bam_out/Salmon_counts
+             mv $sra_id.quant $bam_out/Salmon_counts
   			       if [ "$fastqc" != 0 ]; then
+                  DIRECTORY=$bam_out/Fastqc_out
+                  if [ ! -d "$DIRECTORY" ]; then
+                    mkdir -p $DIRECTORY
+                  fi
   				        mkdir $sra_id.fastqc
   				        fastqc $sra_id."fastq.gz" -o $sra_id.fastqc
   				        rm $sra_id."fastq.gz"
-                  mv $sra_id.fastqc $bam_out
+                  mv $sra_id.fastqc $bam_out/Fastqc_out
+                  echo "##############################"
+                  echo "Pipeline executed successfully"
+                  echo "##############################"
   			       else
   				        rm $sra_id."fastq.gz"
+                  echo "##############################"
+                  echo "Pipeline executed successfully"
+                  echo "##############################"
   			       fi
   		     elif [ "$seq_type" == "PE" ]; then
   			     fastq-dump -A $sra_id --gzip --split-files
   			     salmon quant -i salmon_index -l A -1 $sra_id"_1".fastq.gz -2 $sra_id"_2".fastq.gz -p $num_threads --validateMappings -o $sra_id.quant
-             mv $sra_id.quant $bam_out
+             mkdir -p $bam_out/Salmon_counts
+             mv $sra_id.quant $bam_out/Salmon_counts
   			     if [ "$fastqc" != 0 ]; then
+                DIRECTORY=$bam_out/Fastqc_out
+                if [ ! -d "$DIRECTORY" ]; then
+                  mkdir -p $DIRECTORY
+                fi
       				  mkdir $sra_id"_1".fastqc $sra_id"_2".fastqc
       				  fastqc $sra_id"_1".fastq.gz -o $sra_id"_1".fastqc
       				  fastqc $sra_id"_2".fastq.gz -o $sra_id"_2".fastqc
       				  rm $sra_id"_1".fastq.gz $sra_id"_2".fastq.gz
-                mv $sra_id"_1".fastqc $sra_id"_2".fastqc $bam_out
+                mv $sra_id"_1".fastqc $sra_id"_2".fastqc $bam_out/Fastqc_out
+                echo "##############################"
+                echo "Pipeline executed successfully"
+                echo "##############################"
   			     else
   				      rm $sra_id"_1".fastq.gz $sra_id"_2".fastq.gz
+                echo "##############################"
+                echo "Pipeline executed successfully"
+                echo "##############################"
   			     fi
       	   fi
         fi
