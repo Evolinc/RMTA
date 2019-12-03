@@ -1324,7 +1324,7 @@ elif [ ! -z $sra_id ]; then
             if [ ! -d "$DIRECTORY" ]; then
               mkdir -p $DIRECTORY
             fi
-  	        mv *.fastqc "$bam_out/Fastqc_out"
+  	        mv *.fastqc_out $DIRECTORY
   	      fi
   	      if [ "$hisat" != 0 ]; then
   	        featurecounts
@@ -1370,7 +1370,7 @@ elif [ ! -z $sra_id ]; then
         if [ ! -d "$DIRECTORY" ]; then
           mkdir -p $DIRECTORY
         fi
-        mv *.fastqc "$bam_out/Fastqc_out"
+        mv *.fastqc $DIRECTORY
       fi
       echo "##############################"
       echo "Pipeline executed successfully"
