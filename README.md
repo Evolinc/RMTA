@@ -10,7 +10,7 @@
 
 + RMTA is a workflow that can rapidly process raw RNA-seq illumina data by mapping reads to a genome (HiSat2) and then assemble transcripts using Stringtie.
 + RMTA can process FASTq files containing paired-end or single-end reads. Alternatively, RMTA can directly process one or more sequence read archives (SRA) from NCBI using a SRA ID.
-+ RMTA also supports for read alignment directly to a transcriptome using the quasi-aligner  and transcript abundance quantifier Salmon (Rob et al., 2017; Srivastava et al., 2019). Salmon maps reads to the provided transcript assembly and then counts the number of reads associated with each transcript, generating an output file (quant.sf) that can immediately be used for differential expression. **Note:** The utilization of Salmon is only appropriate when the user is wanting to rapidly test for differential expression and cannot facilitate the identification of novel genes or data visualization in a genome browser. 
++ RMTA also supports read alignment directly to a transcriptome using the quasi-aligner and transcript abundance quantifier Salmon (Rob et al., 2017; Srivastava et al., 2019). Salmon maps reads to the provided transcript assembly and then counts the number of reads associated with each transcript, generating an output file (quant.sf) that can immediately be used for differential expression. **Note:** The utilization of Salmon is only appropriate when the user is wanting to rapidly test for differential expression and cannot facilitate the identification of novel genes or data visualization in a genome browser. 
 
 Genome-guided RMTA minimally requires the following input data:
 
@@ -19,16 +19,16 @@ Genome-guided RMTA minimally requires the following input data:
 
 Transcriptome-guided RMTA minimally requires the following input data:
 
-1. Reference Transcriptome (GFF3/GTF/GFF)
+1. Reference Transcriptome (FASTA)
 2. RNA-Seq reads (FASTQ) - Single end or Paired end or NCBI SRA id or multiple NCBI SRA id's (list in a single column text file).
 
 # Availability 
 ### Using Docker image
 
-Since there are several dependencies (these can be seen in Dockerfile) for running RMTA on your linux or MAC OS, we highly recommend using the available Docker image for RMTA or the [Dockerfile](https://hub.docker.com/r/evolinc/rmta/~/dockerfile/) to build an image and then use the built image. Docker can be installed on any of three platform using the instructions from [Docker website](https://docs.docker.com/engine/installation/). You can also try [Play-With-Docker](http://labs.play-with-docker.com/) for running RMTA using the below instructions 
+Since there are several dependencies (these can be seen in Dockerfile) for running RMTA on your linux or MAC OS, we highly recommend using the available Docker image for RMTA or the [Dockerfile](https://hub.docker.com/r/evolinc/rmta/~/dockerfile/) to build an image and then use the built image. Docker can be installed on any of the three major OS platforms (Linux/Mac/PC) using the instructions from [Docker website](https://docs.docker.com/engine/installation/). You can also try [Play-With-Docker](http://labs.play-with-docker.com/) for running RMTA using the below instructions. 
 
 ### When using Docker
-Threads and memory usage are restricted by Docker (i.e., the VM handling Docker) and thus you may have to adjust memory and CPU allowances for Docker in order to see full utilization of those resources by RMTA.
+Threads and memory usage are restricted by Docker (i.e., the VM handling Docker) and thus you may have to adjust memory and CPU allowances for Docker in order to see full utilization of those resources by RMTA. Memory and CPU requirements will scale with genome size and number of reads being mapped, but should start with a minimum of four cores and 4 GB of memory.
 
 ```
 # Pull the image from Dockerhub
@@ -136,9 +136,9 @@ When using Singularity, you just have to replace `docker run --rm $PWD:/data -w 
 singularity run docker://evolinc/rmta:2.6.3 -r athal.fa.gz -s SRR2037320 -y "PE" -e -O final_out -p 6
 ```
 
-### Using CyVerse Discovery Environment
+### Using in CyVerse's Discovery Environment
 
-The RMTA v2.6.2 app (Search for "RMTA" and then select the 2.6.2 version) is currently integrated in CyVerse’s Discovery Environment (DE) and is free to use by researchers. The complete tutorial is available at this [CyVerse wiki](https://wiki.cyverse.org/wiki/display/DEapps/RMTA+v2.6.2). CyVerse's DE is a free and easy to use GUI that simplifies many aspects of running bioinformatics analyses. If you do not currently have access to a high performance computing cluster, consider taking advantange of the DE.
+The RMTA v2.6.3 app (Search for "RMTA" and then select the 2.6.3 version) is currently integrated in CyVerse’s Discovery Environment (DE) and is free to use by researchers. The complete tutorial is available at this [CyVerse wiki](https://wiki.cyverse.org/wiki/display/DEapps/RMTA+v2.6.3). CyVerse's DE is a free and easy to use GUI that simplifies many aspects of running bioinformatics analyses. If you do not currently have access to a high performance computing cluster, consider taking advantange of the DE.
 
 # Issues
 If you experience any issues with running RMTA (DE app or source code or Docker image), please open an issue on this github repo. Alternatively you can post your queries and feature requests in this [google groups](https://groups.google.com/forum/#!forum/evolinc)
