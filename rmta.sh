@@ -832,8 +832,8 @@ paired_fq_gz()
             echo "bowtie2 -x ref_genome -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
             bowtie2 -x ref_genome -1 ${filename}.fq.gz -2 ${filename2}.fq.gz -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
         fi    
-        echo "samtools view -Sbo $filename3.bam $filename3.sam"
-        samtools view -Sbo $filename3.bam $filename3.sam
+        echo "samtools view -@ $num_threads -Sbo $filename3.bam $filename3.sam"
+        samtools view -@ $num_threads -Sbo $filename3.bam $filename3.sam
         duplicates_paired
         stringtie_non_SRA
         if [ "$hisat" != 0 ]; then
@@ -909,8 +909,8 @@ paired_fq()
             echo "bowtie2 -x ref_genome -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
             bowtie2 -x ref_genome -1 ${filename}.fq -2 ${filename2}.fq -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
         fi    
-        echo "samtools view -Sbo $filename3.bam $filename3.sam"
-        samtools view -Sbo $filename3.bam $filename3.sam
+        echo "samtools view -@ $num_threads -Sbo $filename3.bam $filename3.sam"
+        samtools view -@ $num_threads -Sbo $filename3.bam $filename3.sam
         duplicates_paired
         stringtie_non_SRA
         if [ "$hisat" != 0 ]; then
@@ -986,8 +986,8 @@ paired_fastq_gz()
   	        echo "bowtie2 -x ref_genome -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
   	        bowtie2 -x ref_genome -1 ${filename}.fastq.gz -2 ${filename2}.fastq.gz -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
   	    fi    
-  	    echo "samtools view -Sbo $filename3.bam $filename3.sam"
-  	    samtools view -Sbo $filename3.bam $filename3.sam
+  	    echo "samtools view -@ $num_threads -Sbo $filename3.bam $filename3.sam"
+  	    samtools view -@ $num_threads -Sbo $filename3.bam $filename3.sam
   	    duplicates_paired
   	    stringtie_non_SRA
   	    if [ "$hisat" != 0 ]; then
@@ -1063,8 +1063,8 @@ paired_fastq()
             echo "bowtie2 -x ref_genome -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt"
             bowtie2 -x ref_genome -1 ${filename}.fastq -2 ${filename2}.fastq -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename3.sam --met-file metrics.txt 2>> mapped.txt
         fi    
-        echo "samtools view -Sbo $filename3.bam $filename3.sam"
-        samtools view -Sbo $filename3.bam $filename3.sam
+        echo "samtools view -@ $num_threads -Sbo $filename3.bam $filename3.sam"
+        samtools view -@ $num_threads -Sbo $filename3.bam $filename3.sam
         duplicates_paired
         stringtie_non_SRA
         if [ "$hisat" != 0 ]; then
@@ -1129,8 +1129,8 @@ single_end()
             echo "bowtie2 -x ref_genome -U $f -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename.sam --met-file metrics.txt 2>> mapped.txt"
             bowtie2 -x ref_genome -U $f -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $filename.sam --met-file metrics.txt 2>> mapped.txt
         fi
-        echo "samtools view -Sbo $filename.bam $filename.sam"
-        samtools view -Sbo $filename.bam $filename.sam
+        echo "samtools view -@ $num_threads -Sbo $filename.bam $filename.sam"
+        samtools view -@ $num_threads -Sbo $filename.bam $filename.sam
         echo "sambamba sort --tmpdir=temp -t $num_threads -o $filename.sorted.bam $filename.bam"
         sambamba sort --tmpdir=temp -t $num_threads -o $filename.sorted.bam $filename.bam
         rm -r temp $filename.bam
@@ -1293,7 +1293,7 @@ elif [ ! -z $sra_id ]; then
   	          echo "bowtie2 -x ref_genome --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $f.sam --met-file metrics.txt 2>> mapped.txt"
   	          bowtie2 -x ref_genome --sra-acc $f -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $f.sam --met-file metrics.txt 2>> mapped.txt
   	      fi
-  	      samtools view -Sbo $f.bam $f.sam
+  	      samtools view -@ $num_threads -Sbo $f.bam $f.sam
   	      rm $f.sam
   	      echo "sambamba sort --tmpdir=temp -t $num_threads -o $f.sorted.bam $f.bam"
   	      sambamba sort --tmpdir=temp -t $num_threads -o $f.sorted.bam $f.bam
@@ -1410,7 +1410,7 @@ elif [ ! -z $sra_id ]; then
   	        echo "bowtie2 -x ref_genome --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt"
   	        bowtie2 -x ref_genome --sra-acc $sra_id -p $num_threads -5 $five_trim -3 $three_trim --phred33 -S $sra_id.sam --met-file metrics.txt 2>> mapped.txt
   	    fi
-  	    samtools view -Sbo $sra_id.bam $sra_id.sam
+  	    samtools view -@ $num_threads -Sbo $sra_id.bam $sra_id.sam
   	    rm $sra_id.sam
   	    echo "sambamba sort --tmpdir=temp -t $num_threads -o $sra_id.sorted.bam $sra_id.bam"
   	    sambamba sort --tmpdir=temp -t $num_threads -o $sra_id.sorted.bam $sra_id.bam
