@@ -836,9 +836,6 @@ paired_fq_gz()
         samtools view -@ $num_threads -Sbo $filename3.bam $filename3.sam
         duplicates_paired
         stringtie_non_SRA
-        if [ "$hisat" != 0 ]; then
-          featurecounts
-        fi
         rm $filename3.sam
       else
         if [ "$transcriptome" != 0 ]; then
@@ -913,9 +910,6 @@ paired_fq()
         samtools view -@ $num_threads -Sbo $filename3.bam $filename3.sam
         duplicates_paired
         stringtie_non_SRA
-        if [ "$hisat" != 0 ]; then
-          featurecounts
-        fi
         rm $filename3.sam
       else
         if [ "$transcriptome" != 0 ]; then
@@ -990,9 +984,6 @@ paired_fastq_gz()
   	    samtools view -@ $num_threads -Sbo $filename3.bam $filename3.sam
   	    duplicates_paired
   	    stringtie_non_SRA
-  	    if [ "$hisat" != 0 ]; then
-  	      featurecounts
-  	    fi
   	    rm $filename3.sam
 	    else
         if [ "$transcriptome" != 0 ]; then
@@ -1067,9 +1058,6 @@ paired_fastq()
         samtools view -@ $num_threads -Sbo $filename3.bam $filename3.sam
         duplicates_paired
         stringtie_non_SRA
-        if [ "$hisat" != 0 ]; then
-          featurecounts
-        fi
         rm $filename3.sam
       else
         if [ "$transcriptome" != 0 ]; then
@@ -1142,9 +1130,6 @@ single_end()
           mv $filename.sorted.bam $filename.sorted.bam.bai "$bam_out"
         fi
         stringtie_non_SRA_single
-        if [ "$hisat" != 0 ]; then
-          featurecounts
-        fi
         rm $filename.sam
       else
         if [ "$transcriptome" != 0 ]; then
@@ -1226,6 +1211,9 @@ if [ ! -z "$left_reads" ] && [ ! -z "$right_reads" ]; then
     if [ "$transcriptome" != 0 ]; then
       exit
     fi
+    if [ "$hisat" != 0 ]; then
+        featurecounts
+    fi
     success_message
   
 # Single end reads
@@ -1251,6 +1239,9 @@ elif [ ! -z "$single_reads" ]; then
     single_end
   done
     if [ "$transcriptome" == 0 ]; then
+ 	if [ "$hisat" != 0 ]; then
+  	      featurecounts
+  	fi
     	success_message
     elif [ "$transcriptome" != 0 ]; then
 		  exit
